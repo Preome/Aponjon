@@ -18,18 +18,12 @@ const helpRequestSchema = new mongoose.Schema({
   },
   description: {
     type: String,
-    required: [true, 'Please provide a description'],
-    maxlength: 500
+    required: true
   },
   location: {
     address: String,
     city: String,
-    state: String,
-    zipCode: String,
-    coordinates: {
-      lat: Number,
-      lng: Number
-    }
+    state: String
   },
   status: {
     type: String,
@@ -38,15 +32,11 @@ const helpRequestSchema = new mongoose.Schema({
   },
   urgency: {
     type: String,
-    enum: ['low', 'medium', 'high', 'emergency'],
+    enum: ['low', 'medium', 'high'],
     default: 'medium'
   },
-  preferredTime: {
-    type: Date,
-    required: true
-  },
+  preferredTime: Date,
   completedAt: Date,
-  notes: String,
   createdAt: {
     type: Date,
     default: Date.now

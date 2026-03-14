@@ -7,12 +7,16 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Register from './pages/Register';
 
-// Role-specific dashboards
+// Dashboards
 import ElderlyDashboard from './pages/dashboards/ElderlyDashboard';
 import VolunteerDashboard from './pages/dashboards/VolunteerDashboard';
 import AdminDashboard from './pages/dashboards/AdminDashboard';
 
-// Protected Route Component
+// Request Pages
+import CreateRequest from './pages/CreateRequest';
+import BrowseRequests from './pages/BrowseRequests';
+import MyRequests from './pages/MyRequests';
+
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
   
@@ -21,16 +25,11 @@ const ProtectedRoute = ({ children, allowedRoles }) => {
   }
   
   if (allowedRoles && !allowedRoles.includes(user.role)) {
-    // Redirect to appropriate dashboard based on role
     switch(user.role) {
-      case 'elderly':
-        return <Navigate to="/elderly-dashboard" replace />;
-      case 'volunteer':
-        return <Navigate to="/volunteer-dashboard" replace />;
-      case 'admin':
-        return <Navigate to="/admin-dashboard" replace />;
-      default:
-        return <Navigate to="/" replace />;
+      case 'elderly': return <Navigate to="/elderly-dashboard" replace />;
+      case 'volunteer': return <Navigate to="/volunteer-dashboard" replace />;
+      case 'admin': return <Navigate to="/admin-dashboard" replace />;
+      default: return <Navigate to="/" replace />;
     }
   }
   
@@ -49,31 +48,48 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
-            {/* Protected Routes - Role Specific */}
-            <Route 
-              path="/elderly-dashboard" 
-              element={
-                <ProtectedRoute allowedRoles={['elderly']}>
-                  <ElderlyDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/volunteer-dashboard" 
-              element={
-                <ProtectedRoute allowedRoles={['volunteer']}>
-                  <VolunteerDashboard />
-                </ProtectedRoute>
-              } 
-            />
-            <Route 
-              path="/admin-dashboard" 
-              element={
-                <ProtectedRoute allowedRoles={['admin']}>
-                  <AdminDashboard />
-                </ProtectedRoute>
-              } 
-            />
+            {/* Elderly Routes */}
+            <Route path="/elderly-dashboard" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <ElderlyDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/create-request" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <CreateRequest />
+              </ProtectedRoute>
+            } />
+            <Route path="/my-requests" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <MyRequests />
+              </ProtectedRoute>
+            } />
+            
+            {/* Volunteer Routes */}
+            <Route path="/volunteer-dashboard" element={
+              <ProtectedRoute allowedRoles={['volunteer']}>
+                <VolunteerDashboard />
+              </ProtectedRoute>
+            } />
+            <Route path="/browse-requests" element={
+              <ProtectedRoute allowedRoles={['volunteer']}>
+                <BrowseRequests />
+              </ProtectedRoute>
+            } />
+            
+            {/* Also add /requests as alias for browse-requests */}
+            <Route path="/requests" element={
+              <ProtectedRoute allowedRoles={['volunteer']}>
+                <BrowseRequests />
+              </ProtectedRoute>
+            } />
+            
+            {/* Admin Routes */}
+            <Route path="/admin-dashboard" element={
+              <ProtectedRoute allowedRoles={['admin']}>
+                <AdminDashboard />
+              </ProtectedRoute>
+            } />
           </Routes>
         </main>
         <Footer />

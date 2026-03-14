@@ -16,9 +16,11 @@ mongoose.connect(process.env.MONGODB_URI)
 
 // Import routes
 const userRoutes = require('./routes/userRoutes');
+const helpRoutes = require('./routes/helpRoutes'); // Add this
 
 // Use routes
 app.use('/api/users', userRoutes);
+app.use('/api/help', helpRoutes); // Add this
 
 // Simple test route
 app.get('/api/test', (req, res) => {

@@ -5,20 +5,19 @@ import {
   ClipboardDocumentListIcon,
   CheckCircleIcon,
   ClockIcon,
-  MapPinIcon,
   UserIcon,
-  PhoneIcon
+  PhoneIcon,
+  MapPinIcon
 } from '@heroicons/react/24/outline';
 
 const VolunteerDashboard = () => {
   const { user } = useAuth();
   const [stats, setStats] = useState({
-    acceptedRequests: 0,
-    completedRequests: 0,
-    nearbyRequests: 0
+    accepted: 0,
+    completed: 0,
+    available: 0
   });
   const [activeHelps, setActiveHelps] = useState([]);
-  const [nearbyRequests, setNearbyRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -29,64 +28,24 @@ const VolunteerDashboard = () => {
     try {
       const token = localStorage.getItem('token');
       
-      // Fetch my accepted requests
-      const myRequestsResponse = await fetch('http://localhost:5000/api/help/my-requests', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      // Fetch stats
+      const statsResponse = await fetch('http://localhost:5000/api/help/stats', {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      
-      const myRequests = await myRequestsResponse.json();
-      
-      const accepted = myRequests.filter(r => r.status === 'accepted').length;
-      const completed = myRequests.filter(r => r.status === 'completed').length;
+      const statsData = await statsResponse.json();
+      setStats(statsData);
 
-      setStats(prev => ({
-        ...prev,
-        acceptedRequests: accepted,
-        completedRequests: completed
-      }));
-
-      setActiveHelps(myRequests.filter(r => r.status === 'accepted'));
-
-      // Fetch nearby requests
-      const nearbyResponse = await fetch('http://localhost:5000/api/help/nearby', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
+      // Fetch accepted requests
+      const acceptedResponse = await fetch('http://localhost:5000/api/help/my-accepted', {
+        headers: { 'Authorization': `Bearer ${token}` }
       });
-      
-      const nearby = await nearbyResponse.json();
-      setStats(prev => ({
-        ...prev,
-        nearbyRequests: nearby.length
-      }));
-      setNearbyRequests(nearby.slice(0, 3));
+      const acceptedData = await acceptedResponse.json();
+      setActiveHelps(acceptedData.filter(r => r.status === 'accepted'));
       
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleCompleteRequest = async (requestId) => {
-    try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:5000/api/help/${requestId}/status`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({ status: 'completed' })
-      });
-
-      if (response.ok) {
-        fetchDashboardData();
-      }
-    } catch (error) {
-      console.error('Failed to complete request:', error);
     }
   };
 
@@ -103,7 +62,6 @@ const VolunteerDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4">
-        {/* Welcome Section */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
             Welcome back, {user?.name}!
@@ -114,43 +72,62 @@ const VolunteerDashboard = () => {
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-blue-100 p-3 rounded-lg">
-                <ClipboardDocumentListIcon className="h-6 w-6 text-blue-500" />
-              </div>
+            <div className="bg-blue-100 p-3 rounded-lg w-fit mb-4">
+              <ClipboardDocumentListIcon className="h-6 w-6 text-blue-500" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">{stats.nearbyRequests}</p>
-            <p className="text-gray-600">Nearby Requests</p>
+            <p className="text-3xl font-bold text-gray-900">{stats.available || 0}</p>
+            <p className="text-gray-600">Available Requests</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-yellow-100 p-3 rounded-lg">
-                <ClockIcon className="h-6 w-6 text-yellow-500" />
-              </div>
+            <div className="bg-yellow-100 p-3 rounded-lg w-fit mb-4">
+              <ClockIcon className="h-6 w-6 text-yellow-500" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">{stats.acceptedRequests}</p>
+            <p className="text-3xl font-bold text-gray-900">{stats.accepted || 0}</p>
             <p className="text-gray-600">Active Helps</p>
           </div>
 
           <div className="bg-white rounded-xl shadow-md p-6">
-            <div className="flex items-center justify-between mb-4">
-              <div className="bg-green-100 p-3 rounded-lg">
-                <CheckCircleIcon className="h-6 w-6 text-green-500" />
-              </div>
+            <div className="bg-green-100 p-3 rounded-lg w-fit mb-4">
+              <CheckCircleIcon className="h-6 w-6 text-green-500" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">{stats.completedRequests}</p>
+            <p className="text-3xl font-bold text-gray-900">{stats.completed || 0}</p>
             <p className="text-gray-600">Completed</p>
           </div>
         </div>
 
+        {/* Quick Actions */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          <Link 
+            to="/browse-requests" 
+            className="bg-primary-600 text-white p-6 rounded-xl shadow-md hover:bg-primary-700 transition flex items-center justify-between"
+          >
+            <div>
+              <h3 className="text-xl font-semibold mb-2">Browse Requests</h3>
+              <p className="text-primary-100">Find people who need help</p>
+            </div>
+            <ClipboardDocumentListIcon className="h-8 w-8" />
+          </Link>
+          
+          <Link 
+            to="/my-accepted" 
+            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition border border-gray-200 flex items-center justify-between"
+          >
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">My Helps</h3>
+              <p className="text-gray-600">View your accepted requests</p>
+            </div>
+            <UserIcon className="h-8 w-8 text-gray-400" />
+          </Link>
+        </div>
+
         {/* Active Helps */}
         {activeHelps.length > 0 && (
-          <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+          <div className="bg-white rounded-xl shadow-md p-6">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Active Helps</h2>
             <div className="space-y-4">
               {activeHelps.map((help) => (
-                <div key={help._id} className="bg-blue-50 p-4 rounded-lg">
+                <div key={help._id} className="bg-green-50 p-4 rounded-lg">
                   <div className="flex justify-between items-start mb-3">
                     <div>
                       <h3 className="font-semibold text-gray-900 capitalize">
@@ -158,7 +135,7 @@ const VolunteerDashboard = () => {
                       </h3>
                       <p className="text-sm text-gray-600 mt-1">{help.description}</p>
                     </div>
-                    <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
+                    <span className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm">
                       Active
                     </span>
                   </div>
@@ -166,35 +143,27 @@ const VolunteerDashboard = () => {
                   {help.elderly && (
                     <div className="border-t pt-3 mt-3">
                       <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4">
-                          <div className="flex items-center">
-                            <UserIcon className="h-4 w-4 text-gray-500 mr-1" />
-                            <span className="text-sm text-gray-600">{help.elderly.name}</span>
+                        <div className="space-y-1">
+                          <div className="flex items-center text-sm">
+                            <UserIcon className="h-4 w-4 text-gray-500 mr-2" />
+                            <span className="text-gray-700">{help.elderly.name}</span>
                           </div>
                           {help.location && (
-                            <div className="flex items-center">
-                              <MapPinIcon className="h-4 w-4 text-gray-500 mr-1" />
-                              <span className="text-sm text-gray-600">{help.location.city}</span>
+                            <div className="flex items-center text-sm">
+                              <MapPinIcon className="h-4 w-4 text-gray-500 mr-2" />
+                              <span className="text-gray-600">{help.location.city}</span>
                             </div>
                           )}
                         </div>
-                        <div className="flex space-x-2">
-                          {help.elderly.phone && (
-                            <a
-                              href={`tel:${help.elderly.phone}`}
-                              className="bg-blue-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-blue-700 flex items-center"
-                            >
-                              <PhoneIcon className="h-3 w-3 mr-1" />
-                              Call
-                            </a>
-                          )}
-                          <button
-                            onClick={() => handleCompleteRequest(help._id)}
-                            className="bg-green-600 text-white px-3 py-1 rounded-lg text-sm hover:bg-green-700"
+                        {help.elderly.phone && (
+                          <a
+                            href={`tel:${help.elderly.phone}`}
+                            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 flex items-center"
                           >
-                            Mark Complete
-                          </button>
-                        </div>
+                            <PhoneIcon className="h-4 w-4 mr-1" />
+                            Call
+                          </a>
+                        )}
                       </div>
                     </div>
                   )}
@@ -203,73 +172,6 @@ const VolunteerDashboard = () => {
             </div>
           </div>
         )}
-
-        {/* Nearby Requests */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-          <div className="bg-white rounded-xl shadow-md p-6">
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">Nearby Help Requests</h2>
-            
-            {nearbyRequests.length === 0 ? (
-              <p className="text-gray-500 text-center py-4">No nearby requests</p>
-            ) : (
-              <div className="space-y-4">
-                {nearbyRequests.map((request) => (
-                  <div key={request._id} className="border-b last:border-0 pb-4 last:pb-0">
-                    <div className="flex justify-between items-start mb-2">
-                      <h3 className="font-medium text-gray-900 capitalize">
-                        {request.taskType?.replace('-', ' ')}
-                      </h3>
-                      <span className="text-sm text-gray-500">
-                        {new Date(request.preferredTime).toLocaleDateString()}
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-600 mb-2">{request.description}</p>
-                    {request.location && (
-                      <div className="flex items-center text-sm text-gray-500 mb-2">
-                        <MapPinIcon className="h-4 w-4 mr-1" />
-                        {request.location.city}, {request.location.state}
-                      </div>
-                    )}
-                    <Link
-                      to={`/requests`}
-                      className="text-primary-600 text-sm font-medium hover:text-primary-700"
-                    >
-                      View Details →
-                    </Link>
-                  </div>
-                ))}
-              </div>
-            )}
-            
-            <Link
-              to="/requests"
-              className="mt-4 block text-center text-primary-600 font-medium hover:text-primary-700"
-            >
-              Browse All Requests
-            </Link>
-          </div>
-
-          {/* Quick Actions */}
-          <div className="bg-gradient-to-r from-primary-500 to-secondary-500 rounded-xl shadow-md p-6 text-white">
-            <h3 className="text-xl font-semibold mb-4">Quick Actions</h3>
-            <div className="space-y-3">
-              <Link
-                to="/requests"
-                className="block bg-white bg-opacity-20 p-4 rounded-lg hover:bg-opacity-30 transition"
-              >
-                <p className="font-medium">Browse Available Requests</p>
-                <p className="text-sm opacity-90">Find someone who needs help</p>
-              </Link>
-              <Link
-                to="/profile"
-                className="block bg-white bg-opacity-20 p-4 rounded-lg hover:bg-opacity-30 transition"
-              >
-                <p className="font-medium">Update Your Profile</p>
-                <p className="text-sm opacity-90">Set your availability and location</p>
-              </Link>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   );

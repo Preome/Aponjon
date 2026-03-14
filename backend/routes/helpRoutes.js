@@ -1,24 +1,186 @@
 const express = require('express');
 const router = express.Router();
-const {
-  createRequest,
-  getRequests,
-  getNearbyRequests,
-  acceptRequest,
-  updateRequestStatus,
-  getUserRequests,
-  deleteRequest
-} = require('../controllers/helpController');
-const { protect, admin } = require('../middleware/authMiddleware');
+const HelpRequest = require('../models/HelpRequest');
+const User = require('../models/User');
+const jwt = require('jsonwebtoken');
 
-router.route('/')
-  .post(protect, createRequest)
-  .get(protect, getRequests);
+// Middleware to verify token
+const protect = async (req, res, next) => {
+  let token;
+  
+  if (req.headers.authorization && req.headers.authorization.startsWith('Bearer')) {
+    try {
+      token = req.headers.authorization.split(' ')[1];
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      req.user = await User.findById(decoded.id).select('-password');
+      next();
+    } catch (error) {
+      console.log('Auth error:', error);
+      return res.status(401).json({ message: 'Not authorized' });
+    }
+  } else {
+    return res.status(401).json({ message: 'Not authorized, no token' });
+  }
+};
 
-router.get('/nearby', protect, getNearbyRequests);
-router.get('/my-requests', protect, getUserRequests);
-router.put('/:id/accept', protect, acceptRequest);
-router.put('/:id/status', protect, updateRequestStatus);
-router.delete('/:id', protect, deleteRequest);
+// TEST ROUTE - Check if route is working
+router.get('/test', (req, res) => {
+  res.json({ message: 'Help routes working' });
+});
+
+// Get all pending requests (for volunteers) - FIXED
+router.get('/pending', protect, async (req, res) => {
+  try {
+    console.log('Fetching pending requests for user:', req.user.email);
+    
+    const requests = await HelpRequest.find({ status: 'pending' })
+      .populate('elderly', 'name phone location')
+      .sort('-createdAt');
+    
+    console.log(`Found ${requests.length} pending requests`);
+    res.json(requests);
+  } catch (error) {
+    console.error('Error fetching pending requests:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Create a help request (Elderly only)
+router.post('/', protect, async (req, res) => {
+  try {
+    console.log('Creating request for user:', req.user.email);
+    
+    if (req.user.role !== 'elderly') {
+      return res.status(403).json({ message: 'Only elderly can create requests' });
+    }
+    
+    const request = await HelpRequest.create({
+      elderly: req.user._id,
+      ...req.body,
+      status: 'pending'
+    });
+    
+    console.log('Request created:', request._id);
+    res.status(201).json(request);
+  } catch (error) {
+    console.error('Error creating request:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get my requests (for elderly)
+router.get('/my-requests', protect, async (req, res) => {
+  try {
+    const requests = await HelpRequest.find({ elderly: req.user._id })
+      .populate('volunteer', 'name phone')
+      .sort('-createdAt');
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get my accepted requests (for volunteer)
+router.get('/my-accepted', protect, async (req, res) => {
+  try {
+    const requests = await HelpRequest.find({ 
+      volunteer: req.user._id,
+      status: { $in: ['accepted', 'completed'] }
+    })
+      .populate('elderly', 'name phone location')
+      .sort('-createdAt');
+    res.json(requests);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Accept a request (Volunteer only)
+router.put('/accept/:id', protect, async (req, res) => {
+  try {
+    console.log('Accepting request:', req.params.id);
+    
+    if (req.user.role !== 'volunteer') {
+      return res.status(403).json({ message: 'Only volunteers can accept requests' });
+    }
+    
+    const request = await HelpRequest.findById(req.params.id);
+    
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+    
+    if (request.status !== 'pending') {
+      return res.status(400).json({ message: 'Request already taken' });
+    }
+    
+    request.volunteer = req.user._id;
+    request.status = 'accepted';
+    await request.save();
+    
+    console.log('Request accepted successfully');
+    res.json(request);
+  } catch (error) {
+    console.error('Error accepting request:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Update request status
+router.put('/status/:id', protect, async (req, res) => {
+  try {
+    const { status } = req.body;
+    const request = await HelpRequest.findById(req.params.id);
+    
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+    
+    // Check authorization
+    if (req.user.role === 'elderly' && request.elderly.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+    
+    if (req.user.role === 'volunteer' && request.volunteer?.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+    
+    request.status = status;
+    if (status === 'completed') {
+      request.completedAt = Date.now();
+    }
+    
+    await request.save();
+    res.json(request);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get stats for dashboard
+router.get('/stats', protect, async (req, res) => {
+  try {
+    let stats = {};
+    
+    if (req.user.role === 'elderly') {
+      const total = await HelpRequest.countDocuments({ elderly: req.user._id });
+      const pending = await HelpRequest.countDocuments({ elderly: req.user._id, status: 'pending' });
+      const accepted = await HelpRequest.countDocuments({ elderly: req.user._id, status: 'accepted' });
+      const completed = await HelpRequest.countDocuments({ elderly: req.user._id, status: 'completed' });
+      
+      stats = { total, pending, accepted, completed };
+    } else if (req.user.role === 'volunteer') {
+      const accepted = await HelpRequest.countDocuments({ volunteer: req.user._id, status: 'accepted' });
+      const completed = await HelpRequest.countDocuments({ volunteer: req.user._id, status: 'completed' });
+      const available = await HelpRequest.countDocuments({ status: 'pending' });
+      
+      stats = { accepted, completed, available };
+    }
+    
+    res.json(stats);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
 
 module.exports = router;
