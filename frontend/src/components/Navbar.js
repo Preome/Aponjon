@@ -4,7 +4,7 @@ import {
   Bars3Icon, 
   XMarkIcon, 
   ArrowRightOnRectangleIcon,
-  BellIcon // Add this import
+  BellIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
 
@@ -38,12 +38,26 @@ const Navbar = () => {
     }
   };
 
-  const navigation = [
-    { name: 'Home', href: '/' },
-    { name: 'About', href: '/about' },
-    { name: 'Services', href: '/services' },
-    { name: 'Contact', href: '/contact' },
-  ];
+  // Navigation items - CONDITIONALLY RENDERED
+  const getNavigationItems = () => {
+    // If user is logged in, show minimal navigation
+    if (user) {
+      return [
+        { name: 'Dashboard', href: user.role === 'elderly' ? '/elderly-dashboard' : 
+                               user.role === 'volunteer' ? '/volunteer-dashboard' : 
+                               '/admin-dashboard' }
+      ];
+    }
+    // If not logged in, show full navigation
+    return [
+      { name: 'Home', href: '/' },
+      { name: 'About', href: '/about' },
+      { name: 'Services', href: '/services' },
+      { name: 'Contact', href: '/contact' },
+    ];
+  };
+
+  const navigation = getNavigationItems();
 
   const handleLogout = () => {
     logout();
@@ -71,12 +85,12 @@ const Navbar = () => {
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
-          <Link to="/" className="flex items-center space-x-2">
+          <Link to={user ? getDashboardLink() : '/'} className="flex items-center space-x-2">
             <span className="text-3xl font-bold text-primary-600">Aponjon</span>
             <span className="text-sm text-gray-500 italic">- Elderly Care</span>
           </Link>
 
-          {/* Desktop Menu */}
+          {/* Desktop Menu - CONDITIONAL */}
           <div className="hidden md:flex items-center space-x-8">
             {navigation.map((item) => (
               <Link
@@ -93,7 +107,7 @@ const Navbar = () => {
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
-                {/* Notification Bell - NEW */}
+                {/* Notification Bell */}
                 {user.role === 'elderly' && (
                   <div className="relative">
                     <button
@@ -139,7 +153,7 @@ const Navbar = () => {
                   </div>
                 )}
 
-                {/* Dashboard Link */}
+                {/* Dashboard Link (already in nav, but keep for redundancy) */}
                 <Link
                   to={getDashboardLink()}
                   className="text-primary-600 hover:text-primary-700 font-medium transition duration-300"
