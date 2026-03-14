@@ -14,7 +14,8 @@ import {
   PhoneIcon,
   UserIcon,
   CalendarIcon,
-  HeartIcon
+  HeartIcon,
+  UsersIcon  // ← ADDED THIS IMPORT
 } from '@heroicons/react/24/outline';
 
 const ElderlyDashboard = () => {
@@ -157,7 +158,7 @@ const ElderlyDashboard = () => {
           </div>
         )}
 
-        {/* 🔔 MEDICATION ALERTS - ADDED HERE */}
+        {/* 🔔 MEDICATION ALERTS */}
         <MedicationAlerts />
 
         {/* Stats Cards */}
@@ -203,8 +204,8 @@ const ElderlyDashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions - Now with 4 options including Medications */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
+        {/* Quick Actions - Now with 5 options including Community */}
+        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
           <Link 
             to="/create-request" 
             className="bg-primary-600 text-white p-4 rounded-xl shadow-md hover:bg-primary-700 transition text-center"
@@ -229,13 +230,61 @@ const ElderlyDashboard = () => {
             <h3 className="font-semibold">Medications</h3>
           </Link>
 
+          {/* NEW: Community Button */}
+          <Link 
+            to="/community" 
+            className="bg-green-600 text-white p-4 rounded-xl shadow-md hover:bg-green-700 transition text-center"
+          >
+            <UsersIcon className="h-8 w-8 mx-auto mb-2" />
+            <h3 className="font-semibold">Community</h3>
+          </Link>
+
           <Link 
             to="/health-tips" 
-            className="bg-green-600 text-white p-4 rounded-xl shadow-md hover:bg-green-700 transition text-center"
+            className="bg-orange-600 text-white p-4 rounded-xl shadow-md hover:bg-orange-700 transition text-center"
           >
             <CalendarIcon className="h-8 w-8 mx-auto mb-2" />
             <h3 className="font-semibold">Health Tips</h3>
           </Link>
+        </div>
+
+        {/* 👥 COMMUNITY SECTION - NEW */}
+        <div className="bg-white rounded-xl shadow-md p-6 mb-8">
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="text-xl font-semibold text-gray-900">👥 Elder Community</h2>
+            <Link to="/community" className="text-primary-600 hover:text-primary-700 text-sm font-medium">
+              View All →
+            </Link>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="bg-green-50 p-4 rounded-lg text-center">
+              <div className="text-3xl mb-2">👥</div>
+              <h3 className="font-semibold">Find Friends</h3>
+              <p className="text-sm text-gray-600 mt-1">Connect with other elders</p>
+              <Link to="/community" className="text-green-600 text-sm mt-2 inline-block hover:underline">
+                Browse →
+              </Link>
+            </div>
+            
+            <div className="bg-purple-50 p-4 rounded-lg text-center">
+              <div className="text-3xl mb-2">💬</div>
+              <h3 className="font-semibold">Interest Groups</h3>
+              <p className="text-sm text-gray-600 mt-1">Join hobby and support groups</p>
+              <Link to="/community?tab=groups" className="text-purple-600 text-sm mt-2 inline-block hover:underline">
+                Explore →
+              </Link>
+            </div>
+            
+            <div className="bg-blue-50 p-4 rounded-lg text-center">
+              <div className="text-3xl mb-2">✨</div>
+              <h3 className="font-semibold">Create Group</h3>
+              <p className="text-sm text-gray-600 mt-1">Start your own community</p>
+              <Link to="/create-group" className="text-blue-600 text-sm mt-2 inline-block hover:underline">
+                Create →
+              </Link>
+            </div>
+          </div>
         </div>
 
         {/* Active Help Section */}

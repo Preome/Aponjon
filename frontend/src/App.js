@@ -20,11 +20,18 @@ import NearbyRequests from './pages/NearbyRequests';
 import RateVolunteer from './pages/RateVolunteer';
 
 // Medication Management
-import Medications from './pages/Medications'; // ← NEW IMPORT
+import Medications from './pages/Medications';
 
 // SOS Emergency Pages
 import EmergencyStatus from './pages/EmergencyStatus';
-import EmergencyAlerts from './pages/EmergencyAlerts'; 
+import EmergencyAlerts from './pages/EmergencyAlerts';
+
+// 👥 Community Messaging Pages
+import Community from './pages/Community';
+import Chat from './pages/Chat';
+import GroupChat from './pages/GroupChat';
+import CreateGroup from './pages/CreateGroup';
+import Messages from './pages/Messages'; // ← ADD THIS IMPORT
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
@@ -57,7 +64,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
-            {/* Elderly Routes */}
+            {/* ==================== ELDERLY ROUTES ==================== */}
             <Route path="/elderly-dashboard" element={
               <ProtectedRoute allowedRoles={['elderly']}>
                 <ElderlyDashboard />
@@ -79,21 +86,48 @@ function App() {
               </ProtectedRoute>
             } />
             
-            {/* 💊 Medication Management - NEW */}
+            {/* 💊 Medication Management */}
             <Route path="/medications" element={
               <ProtectedRoute allowedRoles={['elderly']}>
                 <Medications />
               </ProtectedRoute>
             } />
             
-            {/* 🚨 SOS Emergency Route - Elderly only */}
+            {/* 🚨 SOS Emergency Route */}
             <Route path="/emergency-status/:id" element={
               <ProtectedRoute allowedRoles={['elderly']}>
                 <EmergencyStatus />
               </ProtectedRoute>
             } />
             
-            {/* Volunteer Routes */}
+            {/* 👥 COMMUNITY MESSAGING ROUTES */}
+            <Route path="/community" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <Community />
+              </ProtectedRoute>
+            } />
+            <Route path="/messages" element={  // ← ADD THIS ROUTE
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <Messages />
+              </ProtectedRoute>
+            } />
+            <Route path="/chat/:userId" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <Chat />
+              </ProtectedRoute>
+            } />
+            <Route path="/group/:groupId" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <GroupChat />
+              </ProtectedRoute>
+            } />
+            <Route path="/create-group" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <CreateGroup />
+              </ProtectedRoute>
+            } />
+            
+            {/* ==================== VOLUNTEER ROUTES ==================== */}
             <Route path="/volunteer-dashboard" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
                 <VolunteerDashboard />
@@ -115,14 +149,14 @@ function App() {
               </ProtectedRoute>
             } />
             
-            {/* 🚨 Emergency Alerts Route - Volunteer only */}
+            {/* 🚨 Emergency Alerts Route */}
             <Route path="/emergency-alerts" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
                 <EmergencyAlerts />
               </ProtectedRoute>
             } />
             
-            {/* Admin Routes */}
+            {/* ==================== ADMIN ROUTES ==================== */}
             <Route path="/admin-dashboard" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminDashboard />

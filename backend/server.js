@@ -24,14 +24,17 @@ const userRoutes = require('./routes/userRoutes');
 const helpRoutes = require('./routes/helpRoutes');
 const emergencyRoutes = require('./routes/emergencyRoutes');
 const geminiChatRoutes = require('./routes/geminiChatRoutes');
-const medicationRoutes = require('./routes/medicationRoutes'); // ← ADD THIS
+const medicationRoutes = require('./routes/medicationRoutes');
+const messageRoutes = require('./routes/messageRoutes'); // ← ADD THIS
 
 // Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/emergency', emergencyRoutes);
 app.use('/api/gemini', geminiChatRoutes);
-app.use('/api/medications', medicationRoutes); // ← ADD THIS
+app.use('/api/medications', medicationRoutes);
+app.use('/api/messages', messageRoutes);
+ // ← ADD THIS
 
 // Simple test route
 app.get('/api/test', (req, res) => {
