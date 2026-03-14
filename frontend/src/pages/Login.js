@@ -164,13 +164,7 @@ const Login = () => {
           </form>
 
           <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800 font-medium mb-2">Select role and use any email/password:</p>
-            <div className="space-y-1">
-              <p className="text-xs text-blue-600">👴 Elderly → /elderly-dashboard</p>
-              <p className="text-xs text-blue-600">🤝 Volunteer → /volunteer-dashboard</p>
-              <p className="text-xs text-blue-600">👨‍💼 Admin → /admin-dashboard</p>
-            </div>
-            <p className="text-xs text-gray-500 mt-2">Try: elder@gmail.com / 123456</p>
+          
           </div>
 
           <p className="mt-8 text-center text-sm text-gray-600">

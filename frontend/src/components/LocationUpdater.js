@@ -156,7 +156,7 @@ const LocationUpdater = ({ onLocationUpdate }) => {
             </p>
           )}
           {locationSet && (
-            <p className="text-xs text-green-600 mt-1">✅ Location saved successfully</p>
+            <p className="text-xs text-green-600 mt-1"></p>
           )}
         </div>
         <button
@@ -175,8 +175,7 @@ const LocationUpdater = ({ onLocationUpdate }) => {
       )}
       
       <div className="mt-3 text-xs text-gray-500">
-        <p>• You'll only see requests within 3km of your location</p>
-        <p>• Using OpenStreetMap - Completely free, no API key needed</p>
+        
         {!locationSet && !loading && !error && (
           <p className="text-blue-600 mt-1">👉 Click "Update Location" to start</p>
         )}
