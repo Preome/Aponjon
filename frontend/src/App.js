@@ -19,6 +19,9 @@ import MyRequests from './pages/MyRequests';
 import NearbyRequests from './pages/NearbyRequests';
 import RateVolunteer from './pages/RateVolunteer';
 
+// Medication Management
+import Medications from './pages/Medications'; // ← NEW IMPORT
+
 // SOS Emergency Pages
 import EmergencyStatus from './pages/EmergencyStatus';
 import EmergencyAlerts from './pages/EmergencyAlerts'; 
@@ -76,6 +79,13 @@ function App() {
               </ProtectedRoute>
             } />
             
+            {/* 💊 Medication Management - NEW */}
+            <Route path="/medications" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <Medications />
+              </ProtectedRoute>
+            } />
+            
             {/* 🚨 SOS Emergency Route - Elderly only */}
             <Route path="/emergency-status/:id" element={
               <ProtectedRoute allowedRoles={['elderly']}>
@@ -105,7 +115,7 @@ function App() {
               </ProtectedRoute>
             } />
             
-            {/* 🚨 NEW: Emergency Alerts Route - Volunteer only */}
+            {/* 🚨 Emergency Alerts Route - Volunteer only */}
             <Route path="/emergency-alerts" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
                 <EmergencyAlerts />

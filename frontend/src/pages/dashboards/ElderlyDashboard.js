@@ -5,14 +5,16 @@ import SOSButton from '../../components/SOSButton';
 import ElderlyLocationUpdater from '../../components/ElderlyLocationUpdater';
 import AutoLocationUpdater from '../../components/AutoLocationUpdater';
 import Chatbot from '../../components/Chatbot';
-
+import MedicationAlerts from '../../components/MedicationAlerts';
 import {
   ClipboardDocumentListIcon,
   CheckCircleIcon,
   ClockIcon,
   PlusCircleIcon,
   PhoneIcon,
-  UserIcon
+  UserIcon,
+  CalendarIcon,
+  HeartIcon
 } from '@heroicons/react/24/outline';
 
 const ElderlyDashboard = () => {
@@ -155,6 +157,9 @@ const ElderlyDashboard = () => {
           </div>
         )}
 
+        {/* 🔔 MEDICATION ALERTS - ADDED HERE */}
+        <MedicationAlerts />
+
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-md p-6">
@@ -198,28 +203,38 @@ const ElderlyDashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Quick Actions - Now with 4 options including Medications */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Link 
             to="/create-request" 
-            className="bg-primary-600 text-white p-6 rounded-xl shadow-md hover:bg-primary-700 transition flex items-center justify-between"
+            className="bg-primary-600 text-white p-4 rounded-xl shadow-md hover:bg-primary-700 transition text-center"
           >
-            <div>
-              <h3 className="text-xl font-semibold mb-2">Request Help</h3>
-              <p className="text-primary-100">Get assistance with daily tasks</p>
-            </div>
-            <PlusCircleIcon className="h-8 w-8" />
+            <PlusCircleIcon className="h-8 w-8 mx-auto mb-2" />
+            <h3 className="font-semibold">Request Help</h3>
           </Link>
           
           <Link 
             to="/my-requests" 
-            className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition border border-gray-200 flex items-center justify-between"
+            className="bg-blue-600 text-white p-4 rounded-xl shadow-md hover:bg-blue-700 transition text-center"
           >
-            <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">My Requests</h3>
-              <p className="text-gray-600">View all your help requests</p>
-            </div>
-            <ClipboardDocumentListIcon className="h-8 w-8 text-gray-400" />
+            <ClipboardDocumentListIcon className="h-8 w-8 mx-auto mb-2" />
+            <h3 className="font-semibold">My Requests</h3>
+          </Link>
+
+          <Link 
+            to="/medications" 
+            className="bg-purple-600 text-white p-4 rounded-xl shadow-md hover:bg-purple-700 transition text-center"
+          >
+            <HeartIcon className="h-8 w-8 mx-auto mb-2" />
+            <h3 className="font-semibold">Medications</h3>
+          </Link>
+
+          <Link 
+            to="/health-tips" 
+            className="bg-green-600 text-white p-4 rounded-xl shadow-md hover:bg-green-700 transition text-center"
+          >
+            <CalendarIcon className="h-8 w-8 mx-auto mb-2" />
+            <h3 className="font-semibold">Health Tips</h3>
           </Link>
         </div>
 

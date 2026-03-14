@@ -6,6 +6,7 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 
+// Updated CORS configuration
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
@@ -15,28 +16,33 @@ app.use(express.json());
 
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI)
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.log(err));
+.then(() => console.log('✅ MongoDB connected'))
+.catch(err => console.log('❌ MongoDB connection error:', err));
 
 // Import routes
 const userRoutes = require('./routes/userRoutes');
 const helpRoutes = require('./routes/helpRoutes');
-const emergencyRoutes = require('./routes/emergencyRoutes'); // ADD THIS
+const emergencyRoutes = require('./routes/emergencyRoutes');
+const geminiChatRoutes = require('./routes/geminiChatRoutes');
+const medicationRoutes = require('./routes/medicationRoutes'); // ← ADD THIS
 
 // Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/help', helpRoutes);
-app.use('/api/emergency', emergencyRoutes); // ADD THIS
-
-const geminiChatRoutes = require('./routes/geminiChatRoutes');
+app.use('/api/emergency', emergencyRoutes);
 app.use('/api/gemini', geminiChatRoutes);
+app.use('/api/medications', medicationRoutes); // ← ADD THIS
 
-const healthTipsRoutes = require('./routes/healthTipsRoutes');
-app.use('/api/healthtips', healthTipsRoutes);
 // Simple test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Server is working!' });
 });
 
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('❌ Server error:', err.stack);
+  res.status(500).json({ message: 'Something went wrong!' });
+});
+
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
