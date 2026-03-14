@@ -23,10 +23,7 @@ const helpRequestSchema = new mongoose.Schema({
       enum: ['Point'],
       default: 'Point'
     },
-    coordinates: {
-      type: [Number], // [longitude, latitude]
-      required: true
-    },
+    coordinates: [Number],
     address: String,
     city: String
   },
@@ -38,10 +35,21 @@ const helpRequestSchema = new mongoose.Schema({
   urgency: String,
   preferredTime: Date,
   completedAt: Date,
+  // New fields for rating
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5,
+    default: null
+  },
+  review: {
+    type: String,
+    default: null
+  },
+  ratedAt: Date,
   createdAt: { type: Date, default: Date.now }
 });
 
-// Create geospatial index
 helpRequestSchema.index({ location: '2dsphere' });
 
 module.exports = mongoose.model('HelpRequest', helpRequestSchema);

@@ -8,7 +8,7 @@ import {
   UserIcon,
   PhoneIcon,
   MapPinIcon,
-  MapIcon // ← Added MapIcon for nearby requests
+  MapIcon
 } from '@heroicons/react/24/outline';
 
 const VolunteerDashboard = () => {
@@ -19,7 +19,9 @@ const VolunteerDashboard = () => {
     available: 0
   });
   const [activeHelps, setActiveHelps] = useState([]);
+  const [completedHelps, setCompletedHelps] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [completing, setCompleting] = useState(null);
 
   useEffect(() => {
     fetchDashboardData();
@@ -41,12 +43,43 @@ const VolunteerDashboard = () => {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       const acceptedData = await acceptedResponse.json();
+      
+      // Split into active and completed
       setActiveHelps(acceptedData.filter(r => r.status === 'accepted'));
+      setCompletedHelps(acceptedData.filter(r => r.status === 'completed'));
       
     } catch (error) {
       console.error('Failed to fetch dashboard data:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleComplete = async (requestId) => {
+    if (!window.confirm('Have you completed this help request?')) return;
+    
+    setCompleting(requestId);
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:5000/api/help/complete/${requestId}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (response.ok) {
+        alert('✅ Request marked as completed!');
+        fetchDashboardData(); // Refresh data
+      } else {
+        const data = await response.json();
+        alert(data.message || 'Failed to complete request');
+      }
+    } catch (error) {
+      console.error('Failed to complete request:', error);
+      alert('Network error. Please try again.');
+    } finally {
+      setCompleting(null);
     }
   };
 
@@ -84,7 +117,7 @@ const VolunteerDashboard = () => {
             <div className="bg-yellow-100 p-3 rounded-lg w-fit mb-4">
               <ClockIcon className="h-6 w-6 text-yellow-500" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">{stats.accepted || 0}</p>
+            <p className="text-3xl font-bold text-gray-900">{activeHelps.length}</p>
             <p className="text-gray-600">Active Helps</p>
           </div>
 
@@ -92,14 +125,13 @@ const VolunteerDashboard = () => {
             <div className="bg-green-100 p-3 rounded-lg w-fit mb-4">
               <CheckCircleIcon className="h-6 w-6 text-green-500" />
             </div>
-            <p className="text-3xl font-bold text-gray-900">{stats.completed || 0}</p>
+            <p className="text-3xl font-bold text-gray-900">{completedHelps.length}</p>
             <p className="text-gray-600">Completed</p>
           </div>
         </div>
 
-        {/* Quick Actions - Updated with 3 options */}
+        {/* Quick Actions */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {/* Nearby Requests with Map - NEW */}
           <Link 
             to="/nearby-requests" 
             className="bg-green-600 text-white p-6 rounded-xl shadow-md hover:bg-green-700 transition flex items-center justify-between"
@@ -111,7 +143,6 @@ const VolunteerDashboard = () => {
             <MapIcon className="h-8 w-8" />
           </Link>
 
-          {/* Browse Regular Requests */}
           <Link 
             to="/browse-requests" 
             className="bg-primary-600 text-white p-6 rounded-xl shadow-md hover:bg-primary-700 transition flex items-center justify-between"
@@ -123,7 +154,6 @@ const VolunteerDashboard = () => {
             <ClipboardDocumentListIcon className="h-8 w-8" />
           </Link>
           
-          {/* My Helps */}
           <Link 
             to="/my-accepted" 
             className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition border border-gray-200 flex items-center justify-between"
@@ -136,9 +166,9 @@ const VolunteerDashboard = () => {
           </Link>
         </div>
 
-        {/* Active Helps */}
+        {/* Active Helps Section */}
         {activeHelps.length > 0 && (
-          <div className="bg-white rounded-xl shadow-md p-6">
+          <div className="bg-white rounded-xl shadow-md p-6 mb-8">
             <h2 className="text-xl font-semibold text-gray-900 mb-4">Your Active Helps</h2>
             <div className="space-y-4">
               {activeHelps.map((help) => (
@@ -170,17 +200,61 @@ const VolunteerDashboard = () => {
                             </div>
                           )}
                         </div>
-                        {help.elderly.phone && (
-                          <a
-                            href={`tel:${help.elderly.phone}`}
-                            className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm hover:bg-blue-700 flex items-center"
+                        <div className="flex space-x-2">
+                          {help.elderly.phone && (
+                            <a
+                              href={`tel:${help.elderly.phone}`}
+                              className="bg-blue-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-blue-700 flex items-center"
+                            >
+                              <PhoneIcon className="h-4 w-4 mr-1" />
+                              Call
+                            </a>
+                          )}
+                          <button
+                            onClick={() => handleComplete(help._id)}
+                            disabled={completing === help._id}
+                            className="bg-green-600 text-white px-3 py-2 rounded-lg text-sm hover:bg-green-700 flex items-center disabled:opacity-50"
                           >
-                            <PhoneIcon className="h-4 w-4 mr-1" />
-                            Call
-                          </a>
-                        )}
+                            <CheckCircleIcon className="h-4 w-4 mr-1" />
+                            {completing === help._id ? 'Completing...' : 'Complete'}
+                          </button>
+                        </div>
                       </div>
                     </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Completed Helps Section */}
+        {completedHelps.length > 0 && (
+          <div className="bg-white rounded-xl shadow-md p-6">
+            <h2 className="text-xl font-semibold text-gray-900 mb-4">Recently Completed</h2>
+            <div className="space-y-4">
+              {completedHelps.slice(0, 3).map((help) => (
+                <div key={help._id} className="bg-gray-50 p-4 rounded-lg">
+                  <div className="flex justify-between items-start mb-2">
+                    <div>
+                      <h3 className="font-semibold text-gray-900 capitalize">
+                        {help.taskType?.replace('-', ' ')}
+                      </h3>
+                      <p className="text-sm text-gray-600 mt-1">{help.description}</p>
+                    </div>
+                    <span className="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm">
+                      Completed
+                    </span>
+                  </div>
+                  {help.completedAt && (
+                    <p className="text-xs text-gray-400 mt-2">
+                      Completed on: {new Date(help.completedAt).toLocaleDateString()}
+                    </p>
+                  )}
+                  {help.rating && (
+                    <p className="text-sm text-yellow-600 mt-2">
+                      ⭐ Rating: {help.rating}/5
+                    </p>
                   )}
                 </div>
               ))}

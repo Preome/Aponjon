@@ -16,7 +16,8 @@ import AdminDashboard from './pages/dashboards/AdminDashboard';
 import CreateRequest from './pages/CreateRequest';
 import BrowseRequests from './pages/BrowseRequests';
 import MyRequests from './pages/MyRequests';
-import NearbyRequests from './pages/NearbyRequests'; // ← ADD THIS IMPORT
+import NearbyRequests from './pages/NearbyRequests';
+import RateVolunteer from './pages/RateVolunteer'; // ← Added this import
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
@@ -66,6 +67,13 @@ function App() {
               </ProtectedRoute>
             } />
             
+            {/* NEW: Rate Volunteer Route (Elderly only) */}
+            <Route path="/rate-volunteer/:id" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <RateVolunteer />
+              </ProtectedRoute>
+            } />
+            
             {/* Volunteer Routes */}
             <Route path="/volunteer-dashboard" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
@@ -85,7 +93,7 @@ function App() {
               </ProtectedRoute>
             } />
             
-            {/* NEW: Nearby Requests with Map */}
+            {/* Nearby Requests with Map */}
             <Route path="/nearby-requests" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
                 <NearbyRequests />

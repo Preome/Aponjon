@@ -256,4 +256,92 @@ router.get('/stats', protect, async (req, res) => {
   }
 });
 
+// Complete a request (Volunteer marks as completed)
+router.put('/complete/:id', protect, async (req, res) => {
+  try {
+    const request = await HelpRequest.findById(req.params.id);
+    
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+    
+    // Check if volunteer is the one who accepted it
+    if (req.user.role !== 'volunteer' || request.volunteer?.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+    
+    if (request.status !== 'accepted') {
+      return res.status(400).json({ message: 'Request must be accepted first' });
+    }
+    
+    request.status = 'completed';
+    request.completedAt = Date.now();
+    await request.save();
+    
+    res.json({ message: 'Request marked as completed', request });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Add rating and review (Elderly rates after completion)
+router.post('/rate/:id', protect, async (req, res) => {
+  try {
+    const { rating, review } = req.body;
+    const request = await HelpRequest.findById(req.params.id);
+    
+    if (!request) {
+      return res.status(404).json({ message: 'Request not found' });
+    }
+    
+    // Check if elderly is the one who created it
+    if (req.user.role !== 'elderly' || request.elderly.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Not authorized' });
+    }
+    
+    if (request.status !== 'completed') {
+      return res.status(400).json({ message: 'Request must be completed first' });
+    }
+    
+    if (request.rating) {
+      return res.status(400).json({ message: 'Already rated' });
+    }
+    
+    request.rating = rating;
+    request.review = review;
+    request.ratedAt = Date.now();
+    await request.save();
+    
+    res.json({ message: 'Rating submitted successfully', request });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get volunteer's rating stats
+router.get('/volunteer-rating/:volunteerId', async (req, res) => {
+  try {
+    const requests = await HelpRequest.find({ 
+      volunteer: req.params.volunteerId,
+      rating: { $exists: true, $ne: null }
+    });
+    
+    const totalRatings = requests.length;
+    const avgRating = requests.reduce((sum, r) => sum + r.rating, 0) / totalRatings || 0;
+    const ratingCounts = {1:0, 2:0, 3:0, 4:0, 5:0};
+    
+    requests.forEach(r => {
+      ratingCounts[r.rating]++;
+    });
+    
+    res.json({
+      totalRatings,
+      avgRating: avgRating.toFixed(1),
+      ratingCounts
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+});
+
 module.exports = router;

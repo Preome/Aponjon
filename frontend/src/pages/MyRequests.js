@@ -38,6 +38,21 @@ const MyRequests = () => {
     return colors[status] || 'bg-gray-100 text-gray-700';
   };
 
+  const renderStars = (rating) => {
+    return (
+      <div className="flex">
+        {[1, 2, 3, 4, 5].map((star) => (
+          <span
+            key={star}
+            className={`text-lg ${star <= rating ? 'text-yellow-400' : 'text-gray-300'}`}
+          >
+            ★
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 py-12">
@@ -102,14 +117,68 @@ const MyRequests = () => {
                   </div>
                 </div>
 
-                {request.volunteer && request.volunteer.phone && (
+                {/* Show rating if exists */}
+                {request.rating && (
+                  <div className="mt-4 pt-4 border-t">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <p className="text-sm text-gray-500">Your Rating</p>
+                        <div className="flex items-center mt-1">
+                          {renderStars(request.rating)}
+                          <span className="ml-2 text-sm text-gray-600">
+                            ({request.rating}/5)
+                          </span>
+                        </div>
+                        {request.review && (
+                          <p className="text-sm text-gray-600 mt-2 italic">
+                            "{request.review}"
+                          </p>
+                        )}
+                      </div>
+                      {request.completedAt && (
+                        <p className="text-xs text-gray-400">
+                          Completed: {new Date(request.completedAt).toLocaleDateString()}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Show Rate button if completed but not rated */}
+                {request.status === 'completed' && !request.rating && (
+                  <div className="mt-4 pt-4 border-t">
+                    <Link
+                      to={`/rate-volunteer/${request._id}`}
+                      className="inline-flex items-center bg-yellow-500 text-white px-4 py-2 rounded-lg hover:bg-yellow-600 transition"
+                    >
+                      <span className="text-lg mr-1">⭐</span>
+                      Rate Volunteer
+                    </Link>
+                    {request.completedAt && (
+                      <p className="text-xs text-gray-400 mt-2">
+                        Completed on: {new Date(request.completedAt).toLocaleDateString()}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Show call button if volunteer assigned */}
+                {request.volunteer && request.volunteer.phone && request.status !== 'completed' && (
                   <div className="mt-4 pt-4 border-t flex justify-end">
                     <a
                       href={`tel:${request.volunteer.phone}`}
-                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
+                      className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 flex items-center"
                     >
-                      📞 Call Volunteer
+                      <span className="mr-2">📞</span>
+                      Call {request.volunteer.name}
                     </a>
+                  </div>
+                )}
+
+                {/* Show completion date for completed requests */}
+                {request.status === 'completed' && request.completedAt && !request.rating && (
+                  <div className="mt-2 text-xs text-gray-400 text-right">
+                    Completed on: {new Date(request.completedAt).toLocaleDateString()}
                   </div>
                 )}
               </div>

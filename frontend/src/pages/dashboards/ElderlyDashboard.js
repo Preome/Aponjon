@@ -144,7 +144,7 @@ const ElderlyDashboard = () => {
           </Link>
           
           <Link 
-            to="/requests" 
+            to="/my-requests" 
             className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition border border-gray-200 flex items-center justify-between"
           >
             <div>
