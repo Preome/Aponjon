@@ -28,7 +28,80 @@ router.get('/test', (req, res) => {
   res.json({ message: 'Help routes working' });
 });
 
-// Get all pending requests (for volunteers) - FIXED
+// ============= NEARBY REQUESTS (NEW) =============
+// Get nearby pending requests for volunteers (within 3km)
+router.get('/nearby', protect, async (req, res) => {
+  try {
+    console.log('🔍 Nearby requests requested by:', req.user.email);
+    
+    if (req.user.role !== 'volunteer') {
+      return res.status(403).json({ message: 'Only volunteers can view nearby requests' });
+    }
+
+    // Get volunteer's location
+    const volunteer = await User.findById(req.user._id);
+    
+    if (!volunteer.location || !volunteer.location.coordinates) {
+      console.log('📍 Volunteer has no location set');
+      return res.status(400).json({ 
+        message: 'Please update your location first',
+        needsLocation: true 
+      });
+    }
+
+    console.log('📍 Volunteer location:', volunteer.location.coordinates);
+
+    // Find pending requests within 3km (3000 meters)
+    const requests = await HelpRequest.find({
+      status: 'pending',
+      location: {
+        $near: {
+          $geometry: {
+            type: 'Point',
+            coordinates: volunteer.location.coordinates
+          },
+          $maxDistance: 3000 // 3km in meters
+        }
+      }
+    }).populate('elderly', 'name phone location');
+
+    console.log(`✅ Found ${requests.length} nearby requests within 3km`);
+    res.json(requests);
+  } catch (error) {
+    console.error('❌ Error finding nearby requests:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// ============= UPDATE LOCATION =============
+// Update volunteer location
+router.put('/update-location', protect, async (req, res) => {
+  try {
+    const { coordinates, address, city } = req.body;
+    
+    console.log('📍 Updating location for user:', req.user.email);
+    console.log('   Coordinates:', coordinates);
+    console.log('   Address:', address);
+    
+    const user = await User.findById(req.user._id);
+    user.location = {
+      type: 'Point',
+      coordinates,
+      address,
+      city
+    };
+    user.lastLocationUpdate = Date.now();
+    
+    await user.save();
+    console.log('✅ Location updated successfully');
+    res.json({ message: 'Location updated successfully' });
+  } catch (error) {
+    console.error('❌ Error updating location:', error);
+    res.status(500).json({ message: error.message });
+  }
+});
+
+// Get all pending requests (for volunteers)
 router.get('/pending', protect, async (req, res) => {
   try {
     console.log('Fetching pending requests for user:', req.user.email);

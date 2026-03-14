@@ -16,6 +16,7 @@ import AdminDashboard from './pages/dashboards/AdminDashboard';
 import CreateRequest from './pages/CreateRequest';
 import BrowseRequests from './pages/BrowseRequests';
 import MyRequests from './pages/MyRequests';
+import NearbyRequests from './pages/NearbyRequests'; // ← ADD THIS IMPORT
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
@@ -81,6 +82,13 @@ function App() {
             <Route path="/requests" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
                 <BrowseRequests />
+              </ProtectedRoute>
+            } />
+            
+            {/* NEW: Nearby Requests with Map */}
+            <Route path="/nearby-requests" element={
+              <ProtectedRoute allowedRoles={['volunteer']}>
+                <NearbyRequests />
               </ProtectedRoute>
             } />
             

@@ -7,7 +7,8 @@ import {
   ClockIcon,
   UserIcon,
   PhoneIcon,
-  MapPinIcon
+  MapPinIcon,
+  MapIcon // ← Added MapIcon for nearby requests
 } from '@heroicons/react/24/outline';
 
 const VolunteerDashboard = () => {
@@ -96,19 +97,33 @@ const VolunteerDashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        {/* Quick Actions - Updated with 3 options */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          {/* Nearby Requests with Map - NEW */}
+          <Link 
+            to="/nearby-requests" 
+            className="bg-green-600 text-white p-6 rounded-xl shadow-md hover:bg-green-700 transition flex items-center justify-between"
+          >
+            <div>
+              <h3 className="text-xl font-semibold mb-2">Nearby Map</h3>
+              <p className="text-green-100">Find requests within 3km</p>
+            </div>
+            <MapIcon className="h-8 w-8" />
+          </Link>
+
+          {/* Browse Regular Requests */}
           <Link 
             to="/browse-requests" 
             className="bg-primary-600 text-white p-6 rounded-xl shadow-md hover:bg-primary-700 transition flex items-center justify-between"
           >
             <div>
-              <h3 className="text-xl font-semibold mb-2">Browse Requests</h3>
-              <p className="text-primary-100">Find people who need help</p>
+              <h3 className="text-xl font-semibold mb-2">Browse All</h3>
+              <p className="text-primary-100">See all available requests</p>
             </div>
             <ClipboardDocumentListIcon className="h-8 w-8" />
           </Link>
           
+          {/* My Helps */}
           <Link 
             to="/my-accepted" 
             className="bg-white p-6 rounded-xl shadow-md hover:shadow-lg transition border border-gray-200 flex items-center justify-between"

@@ -7,6 +7,7 @@ const CreateRequest = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [gettingLocation, setGettingLocation] = useState(false);
   const [formData, setFormData] = useState({
     taskType: 'groceries',
     description: '',
@@ -33,6 +34,107 @@ const CreateRequest = () => {
     { value: 'high', label: '🔴 High', color: 'red' }
   ];
 
+  // Function to get elderly's current location
+  const getCurrentLocation = () => {
+    return new Promise((resolve, reject) => {
+      setGettingLocation(true);
+      
+      if (!navigator.geolocation) {
+        setGettingLocation(false);
+        reject('Geolocation is not supported by your browser');
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const { latitude, longitude } = position.coords;
+          console.log('📍 Got elderly location:', latitude, longitude);
+          
+          try {
+            // Get address from coordinates using OpenStreetMap (free)
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            );
+            
+            if (!response.ok) {
+              throw new Error('Failed to get address');
+            }
+            
+            const data = await response.json();
+            
+            // Extract city from address
+            const city = data.address?.city || 
+                        data.address?.town || 
+                        data.address?.village || 
+                        data.address?.county || 
+                        'Unknown';
+            
+            const locationData = {
+              coordinates: [longitude, latitude],
+              address: data.display_name || `Location at ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+              city: city
+            };
+            
+            // Update form with location
+            setFormData(prev => ({
+              ...prev,
+              location: {
+                ...prev.location,
+                address: locationData.address,
+                city: locationData.city,
+                coordinates: locationData.coordinates
+              }
+            }));
+            
+            setGettingLocation(false);
+            resolve(locationData);
+          } catch (err) {
+            console.error('Geocoding error:', err);
+            // Fallback if geocoding fails
+            const fallbackLocation = {
+              coordinates: [longitude, latitude],
+              address: `Location at ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+              city: 'Unknown'
+            };
+            
+            setFormData(prev => ({
+              ...prev,
+              location: {
+                ...prev.location,
+                address: fallbackLocation.address,
+                city: fallbackLocation.city,
+                coordinates: fallbackLocation.coordinates
+              }
+            }));
+            
+            setGettingLocation(false);
+            resolve(fallbackLocation);
+          }
+        },
+        (error) => {
+          console.error('Geolocation error:', error);
+          setGettingLocation(false);
+          
+          let errorMessage = 'Please enable location access to create requests';
+          if (error.code === 1) {
+            errorMessage = 'Location permission denied. Please allow location access in your browser.';
+          } else if (error.code === 2) {
+            errorMessage = 'Location unavailable. Please try again.';
+          } else if (error.code === 3) {
+            errorMessage = 'Location request timed out. Please try again.';
+          }
+          
+          reject(errorMessage);
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 10000,
+          maximumAge: 0
+        }
+      );
+    });
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     if (name.includes('.')) {
@@ -55,6 +157,32 @@ const CreateRequest = () => {
     setError('');
 
     try {
+      // First get the elderly's current location
+      let locationData;
+      try {
+        locationData = await getCurrentLocation();
+      } catch (locationErr) {
+        setError(locationErr);
+        setLoading(false);
+        return;
+      }
+
+      // Prepare request data with location
+      const requestData = {
+        taskType: formData.taskType,
+        description: formData.description,
+        urgency: formData.urgency,
+        preferredTime: formData.preferredTime,
+        location: {
+          type: 'Point',
+          coordinates: locationData.coordinates,
+          address: locationData.address,
+          city: locationData.city
+        }
+      };
+
+      console.log('Submitting request:', requestData);
+
       const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:5000/api/help', {
         method: 'POST',
@@ -62,17 +190,19 @@ const CreateRequest = () => {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
-        body: JSON.stringify(formData)
+        body: JSON.stringify(requestData)
       });
 
       const data = await response.json();
 
       if (response.ok) {
+        alert('✅ Request created successfully! Volunteers near you will be notified.');
         navigate('/elderly-dashboard');
       } else {
         setError(data.message || 'Failed to create request');
       }
     } catch (err) {
+      console.error('Submission error:', err);
       setError('Network error. Please try again.');
     } finally {
       setLoading(false);
@@ -101,9 +231,28 @@ const CreateRequest = () => {
           </div>
 
           <div className="py-8 px-8">
+            {/* Location Info Banner */}
+            <div className="bg-blue-50 p-4 rounded-lg mb-6">
+              <div className="flex items-start">
+                <span className="text-2xl mr-3">📍</span>
+                <div>
+                  <h3 className="font-semibold text-blue-800">Location Required</h3>
+                  <p className="text-sm text-blue-600 mt-1">
+                    Your current location will be used to find nearby volunteers. 
+                    You'll be asked for location permission when submitting.
+                  </p>
+                  {formData.location.address && (
+                    <p className="text-xs bg-white p-2 rounded mt-2 text-gray-700">
+                      <span className="font-medium">Detected:</span> {formData.location.address.substring(0, 100)}...
+                    </p>
+                  )}
+                </div>
+              </div>
+            </div>
+
             {error && (
               <div className="bg-red-50 text-red-500 p-4 rounded-lg mb-6">
-                {error}
+                ⚠️ {error}
               </div>
             )}
 
@@ -148,10 +297,10 @@ const CreateRequest = () => {
                 />
               </div>
 
-              {/* Location */}
+              {/* Manual Location (Optional) */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Your Location
+                  Your Location (Optional - for verification)
                 </label>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <input
@@ -161,7 +310,6 @@ const CreateRequest = () => {
                     onChange={handleChange}
                     className="input-field md:col-span-3"
                     placeholder="Street address"
-                    required
                   />
                   <input
                     type="text"
@@ -170,7 +318,6 @@ const CreateRequest = () => {
                     onChange={handleChange}
                     className="input-field"
                     placeholder="City"
-                    required
                   />
                   <input
                     type="text"
@@ -179,9 +326,12 @@ const CreateRequest = () => {
                     onChange={handleChange}
                     className="input-field"
                     placeholder="State"
-                    required
                   />
                 </div>
+                <p className="text-xs text-gray-500 mt-1">
+                  Your actual GPS location will be used for finding nearby volunteers. 
+                  This is just for reference.
+                </p>
               </div>
 
               {/* Urgency */}
@@ -224,12 +374,31 @@ const CreateRequest = () => {
 
               <button
                 type="submit"
-                disabled={loading}
+                disabled={loading || gettingLocation}
                 className="w-full btn-primary py-3 text-lg font-semibold disabled:opacity-50"
               >
-                {loading ? 'Submitting...' : 'Submit Request'}
+                {gettingLocation ? (
+                  <span className="flex items-center justify-center">
+                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Getting your location...
+                  </span>
+                ) : loading ? (
+                  'Submitting...'
+                ) : (
+                  'Submit Request'
+                )}
               </button>
             </form>
+
+            <div className="mt-6 p-4 bg-green-50 rounded-lg">
+              <p className="text-sm text-green-700">
+                <span className="font-bold">📍 How it works:</span> When you submit, we'll use your current location 
+                to find volunteers within 3km. Your location is only used for this purpose.
+              </p>
+            </div>
           </div>
         </div>
       </div>
