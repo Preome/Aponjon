@@ -28,6 +28,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/help', helpRoutes);
 app.use('/api/emergency', emergencyRoutes); // ADD THIS
 
+const geminiChatRoutes = require('./routes/geminiChatRoutes');
+app.use('/api/gemini', geminiChatRoutes);
+
+const healthTipsRoutes = require('./routes/healthTipsRoutes');
+app.use('/api/healthtips', healthTipsRoutes);
 // Simple test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Server is working!' });

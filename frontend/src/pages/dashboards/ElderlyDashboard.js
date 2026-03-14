@@ -4,6 +4,8 @@ import { useAuth } from '../../context/AuthContext';
 import SOSButton from '../../components/SOSButton';
 import ElderlyLocationUpdater from '../../components/ElderlyLocationUpdater';
 import AutoLocationUpdater from '../../components/AutoLocationUpdater';
+import Chatbot from '../../components/Chatbot';
+
 import {
   ClipboardDocumentListIcon,
   CheckCircleIcon,
@@ -289,6 +291,7 @@ const ElderlyDashboard = () => {
         </div>
       </div>
       <SOSButton />
+      <Chatbot />
     </div>
   );
 };
