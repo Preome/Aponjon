@@ -17,7 +17,11 @@ import CreateRequest from './pages/CreateRequest';
 import BrowseRequests from './pages/BrowseRequests';
 import MyRequests from './pages/MyRequests';
 import NearbyRequests from './pages/NearbyRequests';
-import RateVolunteer from './pages/RateVolunteer'; // ← Added this import
+import RateVolunteer from './pages/RateVolunteer';
+
+// SOS Emergency Pages
+import EmergencyStatus from './pages/EmergencyStatus';
+import EmergencyAlerts from './pages/EmergencyAlerts'; 
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user } = useAuth();
@@ -66,11 +70,16 @@ function App() {
                 <MyRequests />
               </ProtectedRoute>
             } />
-            
-            {/* NEW: Rate Volunteer Route (Elderly only) */}
             <Route path="/rate-volunteer/:id" element={
               <ProtectedRoute allowedRoles={['elderly']}>
                 <RateVolunteer />
+              </ProtectedRoute>
+            } />
+            
+            {/* 🚨 SOS Emergency Route - Elderly only */}
+            <Route path="/emergency-status/:id" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <EmergencyStatus />
               </ProtectedRoute>
             } />
             
@@ -85,18 +94,21 @@ function App() {
                 <BrowseRequests />
               </ProtectedRoute>
             } />
-            
-            {/* Also add /requests as alias for browse-requests */}
             <Route path="/requests" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
                 <BrowseRequests />
               </ProtectedRoute>
             } />
-            
-            {/* Nearby Requests with Map */}
             <Route path="/nearby-requests" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
                 <NearbyRequests />
+              </ProtectedRoute>
+            } />
+            
+            {/* 🚨 NEW: Emergency Alerts Route - Volunteer only */}
+            <Route path="/emergency-alerts" element={
+              <ProtectedRoute allowedRoles={['volunteer']}>
+                <EmergencyAlerts />
               </ProtectedRoute>
             } />
             

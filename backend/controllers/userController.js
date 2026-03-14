@@ -45,6 +45,7 @@ const registerUser = async (req, res) => {
       name: user.name,
       email: user.email,
       role: user.role,
+      location: user.location || null, // Include location
       token: generateToken(user._id)
     });
   } catch (error) {
@@ -77,11 +78,15 @@ const loginUser = async (req, res) => {
 
     console.log('Login successful:', email);
 
+    // 🔴 FIXED: Include location in response
     res.json({
       _id: user._id,
       name: user.name,
       email: user.email,
       role: user.role,
+      phone: user.phone,
+      age: user.age,
+      location: user.location || null, // ← THIS WAS MISSING
       token: generateToken(user._id)
     });
   } catch (error) {

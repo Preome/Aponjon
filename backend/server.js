@@ -6,7 +6,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 
-// Updated CORS configuration
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
@@ -22,10 +21,12 @@ mongoose.connect(process.env.MONGODB_URI)
 // Import routes
 const userRoutes = require('./routes/userRoutes');
 const helpRoutes = require('./routes/helpRoutes');
+const emergencyRoutes = require('./routes/emergencyRoutes'); // ADD THIS
 
 // Use routes
 app.use('/api/users', userRoutes);
 app.use('/api/help', helpRoutes);
+app.use('/api/emergency', emergencyRoutes); // ADD THIS
 
 // Simple test route
 app.get('/api/test', (req, res) => {

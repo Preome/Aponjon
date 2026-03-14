@@ -13,7 +13,7 @@ const helpRequestSchema = new mongoose.Schema({
   },
   taskType: {
     type: String,
-    enum: ['medicine', 'groceries', 'doctor-visit', 'companionship', 'other'],
+    enum: ['medicine', 'groceries', 'doctor-visit', 'companionship', 'other', 'emergency'],
     required: true
   },
   description: String,
@@ -32,20 +32,27 @@ const helpRequestSchema = new mongoose.Schema({
     enum: ['pending', 'accepted', 'completed', 'cancelled'],
     default: 'pending'
   },
-  urgency: String,
+  urgency: {
+    type: String,
+    enum: ['low', 'medium', 'high', 'emergency'],
+    default: 'medium'
+  },
+  isEmergency: {
+    type: Boolean,
+    default: false
+  },
+  emergencyResponded: [{
+    volunteer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'User'
+    },
+    respondedAt: Date,
+    message: String
+  }],
   preferredTime: Date,
   completedAt: Date,
-  // New fields for rating
-  rating: {
-    type: Number,
-    min: 1,
-    max: 5,
-    default: null
-  },
-  review: {
-    type: String,
-    default: null
-  },
+  rating: Number,
+  review: String,
   ratedAt: Date,
   createdAt: { type: Date, default: Date.now }
 });

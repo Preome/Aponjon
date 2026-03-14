@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom'; // Add useNavigate
 import { useAuth } from '../../context/AuthContext';
 import {
   ClipboardDocumentListIcon,
@@ -12,6 +12,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 const VolunteerDashboard = () => {
+  const navigate = useNavigate(); // Add this
   const { user } = useAuth();
   const [stats, setStats] = useState({
     accepted: 0,
@@ -22,10 +23,28 @@ const VolunteerDashboard = () => {
   const [completedHelps, setCompletedHelps] = useState([]);
   const [loading, setLoading] = useState(true);
   const [completing, setCompleting] = useState(null);
+  const [pendingEmergencies, setPendingEmergencies] = useState(0); // Add this
 
   useEffect(() => {
     fetchDashboardData();
+    checkEmergencies();
+    // Check for emergencies every 10 seconds
+    const interval = setInterval(checkEmergencies, 10000);
+    return () => clearInterval(interval);
   }, []);
+
+  const checkEmergencies = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/emergency/pending-emergencies', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const data = await response.json();
+      setPendingEmergencies(data.length);
+    } catch (error) {
+      console.error('Failed to check emergencies:', error);
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -103,8 +122,27 @@ const VolunteerDashboard = () => {
           <p className="text-gray-600">Ready to help someone today?</p>
         </div>
 
+        {/* Emergency Alert Banner - Shows if there are pending emergencies */}
+        {pendingEmergencies > 0 && (
+          <div className="bg-red-600 text-white p-4 rounded-lg mb-6 animate-pulse cursor-pointer" 
+               onClick={() => navigate('/emergency-alerts')}>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center">
+                <span className="text-3xl mr-3">🚨</span>
+                <div>
+                  <h3 className="font-bold text-lg">{pendingEmergencies} Emergency SOS {pendingEmergencies === 1 ? 'Alert' : 'Alerts'}!</h3>
+                  <p className="text-red-100">Click to view and respond immediately</p>
+                </div>
+              </div>
+              <span className="bg-white text-red-600 px-4 py-2 rounded-lg font-bold">
+                View Now →
+              </span>
+            </div>
+          </div>
+        )}
+
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
           <div className="bg-white rounded-xl shadow-md p-6">
             <div className="bg-blue-100 p-3 rounded-lg w-fit mb-4">
               <ClipboardDocumentListIcon className="h-6 w-6 text-blue-500" />
@@ -128,10 +166,44 @@ const VolunteerDashboard = () => {
             <p className="text-3xl font-bold text-gray-900">{completedHelps.length}</p>
             <p className="text-gray-600">Completed</p>
           </div>
+
+          {/* Emergency Stats Card */}
+          <div className="bg-red-50 rounded-xl shadow-md p-6 border-2 border-red-200">
+            <div className="flex items-center justify-between mb-4">
+              <div className="bg-red-100 p-3 rounded-lg">
+                <span className="text-2xl">🚨</span>
+              </div>
+              {pendingEmergencies > 0 && (
+                <span className="bg-red-600 text-white px-2 py-1 rounded-full text-xs animate-pulse">
+                  {pendingEmergencies} NEW
+                </span>
+              )}
+            </div>
+            <p className="text-3xl font-bold text-gray-900">{pendingEmergencies}</p>
+            <p className="text-gray-600">Pending Emergencies</p>
+          </div>
         </div>
 
-        {/* Quick Actions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        {/* Quick Actions - Now with 4 columns including Emergency */}
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+          {/* Emergency Alerts Button - NEW */}
+          <button
+            onClick={() => navigate('/emergency-alerts')}
+            className={`p-6 rounded-xl shadow-md transition flex items-center justify-between ${
+              pendingEmergencies > 0 
+                ? 'bg-red-600 text-white hover:bg-red-700 animate-pulse' 
+                : 'bg-orange-500 text-white hover:bg-orange-600'
+            }`}
+          >
+            <div>
+              <h3 className="text-xl font-semibold mb-2">🚨 EMERGENCY</h3>
+              <p className={pendingEmergencies > 0 ? 'text-red-100' : 'text-orange-100'}>
+                {pendingEmergencies > 0 ? `${pendingEmergencies} active alerts` : 'No active alerts'}
+              </p>
+            </div>
+            <span className="text-4xl">🚨</span>
+          </button>
+
           <Link 
             to="/nearby-requests" 
             className="bg-green-600 text-white p-6 rounded-xl shadow-md hover:bg-green-700 transition flex items-center justify-between"

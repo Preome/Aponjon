@@ -1,6 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import SOSButton from '../../components/SOSButton';
+import ElderlyLocationUpdater from '../../components/ElderlyLocationUpdater';
+import AutoLocationUpdater from '../../components/AutoLocationUpdater';
 import {
   ClipboardDocumentListIcon,
   CheckCircleIcon,
@@ -20,10 +23,29 @@ const ElderlyDashboard = () => {
   });
   const [recentRequests, setRecentRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [locationUpdated, setLocationUpdated] = useState(false);
+  const [autoUpdateDone, setAutoUpdateDone] = useState(false);
 
   useEffect(() => {
     fetchDashboardData();
+    checkLocationStatus();
   }, []);
+
+  const checkLocationStatus = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:5000/api/users/me', {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const userData = await response.json();
+      
+      if (userData.location && userData.location.coordinates) {
+        setLocationUpdated(true);
+      }
+    } catch (error) {
+      console.error('Failed to check location:', error);
+    }
+  };
 
   const fetchDashboardData = async () => {
     try {
@@ -57,6 +79,13 @@ const ElderlyDashboard = () => {
     }
   };
 
+  const handleLocationUpdate = () => {
+    setLocationUpdated(true);
+    setAutoUpdateDone(true);
+    // Dispatch event for SOS button
+    window.dispatchEvent(new Event('locationUpdated'));
+  };
+
   const getStatusColor = (status) => {
     switch(status) {
       case 'pending': return 'bg-yellow-100 text-yellow-700';
@@ -78,6 +107,9 @@ const ElderlyDashboard = () => {
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
+      {/* Auto Location Updater - runs automatically on page load */}
+      <AutoLocationUpdater onComplete={handleLocationUpdate} />
+      
       <div className="container mx-auto px-4">
         {/* Welcome Section */}
         <div className="mb-8">
@@ -86,6 +118,40 @@ const ElderlyDashboard = () => {
           </h1>
           <p className="text-gray-600">Here's your care request overview</p>
         </div>
+
+        {/* Manual Location Updater (backup) */}
+        {!autoUpdateDone && (
+          <ElderlyLocationUpdater onLocationUpdate={handleLocationUpdate} />
+        )}
+
+        {/* SOS Status Banner */}
+        {!locationUpdated && (
+          <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+            <div className="flex">
+              <div className="flex-shrink-0">
+                <span className="text-yellow-400 text-xl">⚠️</span>
+              </div>
+              <div className="ml-3">
+                <p className="text-sm text-yellow-700">
+                  <span className="font-bold">SOS Button:</span> Getting your location automatically... Please wait.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Emergency SOS Banner - Shows when SOS is active */}
+        {recentRequests.some(r => r.isEmergency && r.status === 'pending') && (
+          <div className="bg-red-600 text-white p-4 rounded-lg mb-6 animate-pulse">
+            <div className="flex items-center">
+              <span className="text-3xl mr-3">🚨</span>
+              <div>
+                <h3 className="font-bold text-lg">Emergency SOS Sent!</h3>
+                <p className="text-red-100">Waiting for volunteer response...</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Stats Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
@@ -222,6 +288,7 @@ const ElderlyDashboard = () => {
           )}
         </div>
       </div>
+      <SOSButton />
     </div>
   );
 };
