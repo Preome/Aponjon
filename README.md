@@ -30,11 +30,11 @@ Frontend: React, Tailwind css
 
 Backend: Node.js,Express.js,MongoDB
 
-# Backend
-npm run dev     # Start development server
-npm start       # Start production server
+# Backend Setup
+-npm run dev     
+-npm start       
 
-# Frontend
-npm start       # Start development server
-npm run build   # Build for production
+# Frontend Setup
+-npm start       
+n-pm run build   
 
