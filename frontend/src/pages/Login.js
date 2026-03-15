@@ -163,9 +163,7 @@ const Login = () => {
             </button>
           </form>
 
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          
-          </div>
+          {/* REMOVED THE EMPTY BLUE BOX */}
 
           <p className="mt-8 text-center text-sm text-gray-600">
             Don't have an account?{' '}
