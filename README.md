@@ -36,5 +36,5 @@ Backend: Node.js,Express.js,MongoDB
 
 # Frontend Setup
 -npm start       
-n-pm run build   
+*npm run build   
 
