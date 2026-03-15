@@ -10,7 +10,7 @@ Aponjon is a full-stack platform that enables elderly users to request help, man
 
 📊 Health Reports - Track vitals and generate PDF reports for doctors
 
-🤖 AI Health Assistant - 24/7 chatbot powered by Google Gemini AI
+🤖 AI Health Assistant - 24/7 Health Assistant chatbot 
 
 👥 Community - Connect with other elders via groups and private chat
 
