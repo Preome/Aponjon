@@ -25,7 +25,7 @@ const emergencyRoutes = require('./routes/emergencyRoutes');
 const geminiChatRoutes = require('./routes/geminiChatRoutes');
 const medicationRoutes = require('./routes/medicationRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-const healthReportRoutes = require('./routes/healthReportRoutes');
+const healthReportRoutes = require('./routes/HealthReportRoutes');
 const adminRoutes = require('./routes/adminRoutes'); // ← ADD THIS
 
 // Use routes
