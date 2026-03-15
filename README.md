@@ -2,7 +2,7 @@
 
 Aponjon is a full-stack platform that enables elderly users to request help, manage medications, track health, and connect with volunteers and other seniors through real-time location-based matching and AI-powered assistance.
 
-## Features
+## Key Features
 
 🆘 SOS Emergency - One-click alert notifies nearby volunteers (3km radius)
 
@@ -15,3 +15,26 @@ Aponjon is a full-stack platform that enables elderly users to request help, man
 👥 Community - Connect with other elders via groups and private chat
 
 📍 Help Requests - Request assistance with daily tasks from nearby volunteers
+
+🗺️ Nearby Map - View help requests within 3km on interactive map
+
+✅ Task Management - Accept, complete, and track help requests
+
+⭐ Ratings - Receive feedback and reviews from elderly users
+
+🚨 Emergency Alerts - Get instant notifications about SOS emergencies
+
+## Tech Stack
+
+Frontend: React, Tailwind css
+
+Backend: Node.js,Express.js,MongoDB
+
+# Backend
+npm run dev     # Start development server
+npm start       # Start production server
+
+# Frontend
+npm start       # Start development server
+npm run build   # Build for production
+
