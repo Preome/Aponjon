@@ -1,6 +1,6 @@
 # Aponjon - Elderly Care & Assistance Platform
 
-Aponjon is a full-stack platform that enables elderly users to request help, manage medications, track health, and connect with volunteers and other seniors through real-time location-based matching and AI-powered assistance.
+Aponjon is a compassionate digital web platform designed to transform elderly care through community-driven support. Our platform bridges the gap between seniors who need assistance and volunteers willing to help, creating a safety net of care, companionship, and emergency response.The main mission of this platform is to empower elderly individuals to live independently with dignity, while fostering a connected community where everyone can contribute to the well-being of their senior neighbors.
 
 ## Key Features
 
