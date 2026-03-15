@@ -8,8 +8,7 @@ const Login = () => {
   const { login, loading: authLoading, error: authError } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
-    password: '',
-    role: 'elderly'
+    password: ''
   });
   const [error, setError] = useState('');
   const [localLoading, setLocalLoading] = useState(false);
@@ -28,38 +27,35 @@ const Login = () => {
     
     try {
       console.log('Logging in with:', formData.email);
-      const result = await login(formData.email, formData.password, formData.role);
+      const result = await login(formData.email, formData.password);
+      
+      console.log('Login result:', result);
       
       if (result.success) {
-        console.log('Login successful, redirecting...');
-        switch(formData.role) {
-          case 'elderly':
-            navigate('/elderly-dashboard');
-            break;
-          case 'volunteer':
-            navigate('/volunteer-dashboard');
-            break;
-          case 'admin':
-            navigate('/admin-dashboard');
-            break;
-          default:
-            navigate('/');
+        console.log('Login successful, role:', result.role);
+        
+        // Redirect based on user role from response
+        if (result.role === 'elderly') {
+          navigate('/elderly-dashboard');
+        } else if (result.role === 'volunteer') {
+          navigate('/volunteer-dashboard');
+        } else if (result.role === 'admin') {
+          navigate('/admin-dashboard');
+        } else {
+          console.log('Unknown role:', result.role);
+          // Fallback to home if role is unknown
+          navigate('/');
         }
       } else {
         setError(result.error || 'Login failed');
         setLocalLoading(false);
       }
     } catch (err) {
+      console.error('Login error:', err);
       setError('An error occurred. Please try again.');
       setLocalLoading(false);
     }
   };
-
-  const roles = [
-    { value: 'elderly', label: 'Elderly Person', icon: '👴' },
-    { value: 'volunteer', label: 'Volunteer', icon: '🤝' },
-    { value: 'admin', label: 'Administrator', icon: '👨‍💼' }
-  ];
 
   const isLoading = localLoading || authLoading;
 
@@ -79,33 +75,6 @@ const Login = () => {
           )}
           
           <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">
-                I am a:
-              </label>
-              <div className="grid grid-cols-3 gap-3">
-                {roles.map((role) => (
-                  <button
-                    key={role.value}
-                    type="button"
-                    onClick={() => setFormData({...formData, role: role.value})}
-                    className={`p-3 rounded-lg border-2 transition-all ${
-                      formData.role === role.value
-                        ? 'border-primary-600 bg-primary-50'
-                        : 'border-gray-200 hover:border-gray-300'
-                    }`}
-                  >
-                    <div className="text-2xl mb-1">{role.icon}</div>
-                    <div className={`text-xs font-medium ${
-                      formData.role === role.value ? 'text-primary-600' : 'text-gray-600'
-                    }`}>
-                      {role.label}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            </div>
-
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
@@ -162,8 +131,6 @@ const Login = () => {
               )}
             </button>
           </form>
-
-          {/* REMOVED THE EMPTY BLUE BOX */}
 
           <p className="mt-8 text-center text-sm text-gray-600">
             Don't have an account?{' '}

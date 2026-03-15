@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Load user from localStorage on mount - SIMPLIFIED VERSION
+  // Load user from localStorage on mount
   useEffect(() => {
     const loadUser = () => {
       try {
@@ -28,7 +28,6 @@ export const AuthProvider = ({ children }) => {
         });
         
         if (token && storedUser) {
-          // Just trust the stored user data without verification
           const parsedUser = JSON.parse(storedUser);
           console.log('User restored from storage:', parsedUser.email);
           setUser(parsedUser);
@@ -45,9 +44,10 @@ export const AuthProvider = ({ children }) => {
     };
 
     loadUser();
-  }, []); // Empty dependency array - runs once on mount
+  }, []);
 
-  const login = async (email, password, selectedRole) => {
+  // UPDATED: Removed selectedRole parameter and return role
+  const login = async (email, password) => {
     try {
       setLoading(true);
       setError(null);
@@ -70,7 +70,10 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data));
         setUser(data);
-        return { success: true };
+        return { 
+          success: true, 
+          role: data.role  // Return the role from response
+        };
       } else {
         setError(data.message || 'Login failed');
         return { success: false, error: data.message };
@@ -103,7 +106,7 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data));
         setUser(data);
-        return { success: true };
+        return { success: true, role: data.role };
       } else {
         setError(data.message || 'Registration failed');
         return { success: false, error: data.message };
