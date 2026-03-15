@@ -15,7 +15,8 @@ import {
   UserIcon,
   CalendarIcon,
   HeartIcon,
-  UsersIcon  // ← ADDED THIS IMPORT
+  UsersIcon,
+  DocumentTextIcon  // ← ADD THIS IMPORT
 } from '@heroicons/react/24/outline';
 
 const ElderlyDashboard = () => {
@@ -204,14 +205,14 @@ const ElderlyDashboard = () => {
           </div>
         </div>
 
-        {/* Quick Actions - Now with 5 options including Community */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        {/* Quick Actions - Now with 6 options including Health Reports */}
+        <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
           <Link 
             to="/create-request" 
             className="bg-primary-600 text-white p-4 rounded-xl shadow-md hover:bg-primary-700 transition text-center"
           >
             <PlusCircleIcon className="h-8 w-8 mx-auto mb-2" />
-            <h3 className="font-semibold">Request Help</h3>
+            <h3 className="font-semibold text-sm">Request Help</h3>
           </Link>
           
           <Link 
@@ -219,7 +220,7 @@ const ElderlyDashboard = () => {
             className="bg-blue-600 text-white p-4 rounded-xl shadow-md hover:bg-blue-700 transition text-center"
           >
             <ClipboardDocumentListIcon className="h-8 w-8 mx-auto mb-2" />
-            <h3 className="font-semibold">My Requests</h3>
+            <h3 className="font-semibold text-sm">My Requests</h3>
           </Link>
 
           <Link 
@@ -227,16 +228,24 @@ const ElderlyDashboard = () => {
             className="bg-purple-600 text-white p-4 rounded-xl shadow-md hover:bg-purple-700 transition text-center"
           >
             <HeartIcon className="h-8 w-8 mx-auto mb-2" />
-            <h3 className="font-semibold">Medications</h3>
+            <h3 className="font-semibold text-sm">Medications</h3>
           </Link>
 
-          {/* NEW: Community Button */}
+          {/* NEW: Health Reports Button */}
+          <Link 
+            to="/health-reports" 
+            className="bg-indigo-600 text-white p-4 rounded-xl shadow-md hover:bg-indigo-700 transition text-center"
+          >
+            <DocumentTextIcon className="h-8 w-8 mx-auto mb-2" />
+            <h3 className="font-semibold text-sm">Health Reports</h3>
+          </Link>
+
           <Link 
             to="/community" 
             className="bg-green-600 text-white p-4 rounded-xl shadow-md hover:bg-green-700 transition text-center"
           >
             <UsersIcon className="h-8 w-8 mx-auto mb-2" />
-            <h3 className="font-semibold">Community</h3>
+            <h3 className="font-semibold text-sm">Community</h3>
           </Link>
 
           <Link 
@@ -244,11 +253,11 @@ const ElderlyDashboard = () => {
             className="bg-orange-600 text-white p-4 rounded-xl shadow-md hover:bg-orange-700 transition text-center"
           >
             <CalendarIcon className="h-8 w-8 mx-auto mb-2" />
-            <h3 className="font-semibold">Health Tips</h3>
+            <h3 className="font-semibold text-sm">Health Tips</h3>
           </Link>
         </div>
 
-        {/* 👥 COMMUNITY SECTION - NEW */}
+        {/* 👥 COMMUNITY SECTION */}
         <div className="bg-white rounded-xl shadow-md p-6 mb-8">
           <div className="flex justify-between items-center mb-4">
             <h2 className="text-xl font-semibold text-gray-900">👥 Elder Community</h2>

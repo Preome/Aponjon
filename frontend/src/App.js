@@ -26,15 +26,27 @@ import Medications from './pages/Medications';
 import EmergencyStatus from './pages/EmergencyStatus';
 import EmergencyAlerts from './pages/EmergencyAlerts';
 
-// 👥 Community Messaging Pages
+// Community Messaging Pages
 import Community from './pages/Community';
 import Chat from './pages/Chat';
 import GroupChat from './pages/GroupChat';
 import CreateGroup from './pages/CreateGroup';
-import Messages from './pages/Messages'; // ← ADD THIS IMPORT
+import Messages from './pages/Messages';
+
+// Health Reports Pages
+import HealthReports from './pages/HealthReports';
+import AddHealthRecord from './pages/AddHealthRecord';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-600"></div>
+      </div>
+    );
+  }
   
   if (!user) {
     return <Navigate to="/login" replace />;
@@ -64,7 +76,7 @@ function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             
-            {/* ==================== ELDERLY ROUTES ==================== */}
+            {/* Elderly Routes */}
             <Route path="/elderly-dashboard" element={
               <ProtectedRoute allowedRoles={['elderly']}>
                 <ElderlyDashboard />
@@ -85,28 +97,22 @@ function App() {
                 <RateVolunteer />
               </ProtectedRoute>
             } />
-            
-            {/* 💊 Medication Management */}
             <Route path="/medications" element={
               <ProtectedRoute allowedRoles={['elderly']}>
                 <Medications />
               </ProtectedRoute>
             } />
-            
-            {/* 🚨 SOS Emergency Route */}
             <Route path="/emergency-status/:id" element={
               <ProtectedRoute allowedRoles={['elderly']}>
                 <EmergencyStatus />
               </ProtectedRoute>
             } />
-            
-            {/* 👥 COMMUNITY MESSAGING ROUTES */}
             <Route path="/community" element={
               <ProtectedRoute allowedRoles={['elderly']}>
                 <Community />
               </ProtectedRoute>
             } />
-            <Route path="/messages" element={  // ← ADD THIS ROUTE
+            <Route path="/messages" element={
               <ProtectedRoute allowedRoles={['elderly']}>
                 <Messages />
               </ProtectedRoute>
@@ -126,8 +132,18 @@ function App() {
                 <CreateGroup />
               </ProtectedRoute>
             } />
+            <Route path="/health-reports" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <HealthReports />
+              </ProtectedRoute>
+            } />
+            <Route path="/add-health-record" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <AddHealthRecord />
+              </ProtectedRoute>
+            } />
             
-            {/* ==================== VOLUNTEER ROUTES ==================== */}
+            {/* Volunteer Routes */}
             <Route path="/volunteer-dashboard" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
                 <VolunteerDashboard />
@@ -148,15 +164,13 @@ function App() {
                 <NearbyRequests />
               </ProtectedRoute>
             } />
-            
-            {/* 🚨 Emergency Alerts Route */}
             <Route path="/emergency-alerts" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
                 <EmergencyAlerts />
               </ProtectedRoute>
             } />
             
-            {/* ==================== ADMIN ROUTES ==================== */}
+            {/* Admin Routes */}
             <Route path="/admin-dashboard" element={
               <ProtectedRoute allowedRoles={['admin']}>
                 <AdminDashboard />
