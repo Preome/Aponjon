@@ -268,18 +268,7 @@ const Register = () => {
           </form>
 
           {/* Role-based dashboard info - Updated */}
-          <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-            <p className="text-sm text-blue-800 font-medium mb-2">After registration, you'll be redirected to:</p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs">
-              <div className="bg-white p-2 rounded">
-                <span className="font-semibold">👴 Elderly:</span> /elderly-dashboard
-              </div>
-              <div className="bg-white p-2 rounded">
-                <span className="font-semibold">🤝 Volunteer:</span> /volunteer-dashboard
-              </div>
-            </div>
-          </div>
-
+         
           <p className="mt-8 text-center text-sm text-gray-600">
             Already have an account?{' '}
             <Link to="/login" className="font-medium text-primary-600 hover:text-primary-500">

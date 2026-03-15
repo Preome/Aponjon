@@ -66,7 +66,7 @@ const Navbar = () => {
           {/* Logo - White text */}
           <Link to={user ? getDashboardLink() : '/'} className="flex items-center space-x-2">
             <span className="text-3xl font-bold text-white">Aponjon</span>
-            <span className="text-sm text-white/80 italic">- Elderly Care</span>
+            
           </Link>
 
           {/* Empty middle section */}

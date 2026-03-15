@@ -73,7 +73,7 @@ const ElderlyLocationUpdater = ({ onLocationUpdate }) => {
             if (onLocationUpdate) {
               onLocationUpdate({ latitude, longitude });
             }
-            alert('✅ Location updated successfully! You can now use SOS.');
+            alert('Location updated successfully! You can now use SOS.');
           } else {
             setError('Failed to save location');
           }

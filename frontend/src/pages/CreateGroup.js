@@ -145,19 +145,7 @@ const CreateGroup = () => {
               </div>
 
               {/* Privacy Setting */}
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  name="isPrivate"
-                  id="isPrivate"
-                  checked={formData.isPrivate}
-                  onChange={handleChange}
-                  className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
-                />
-                <label htmlFor="isPrivate" className="ml-2 block text-sm text-gray-700">
-                  Make this group private (members need approval to join)
-                </label>
-              </div>
+              
 
               <div className="bg-blue-50 p-4 rounded-lg">
                 <p className="text-sm text-blue-800">

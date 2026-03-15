@@ -35,7 +35,7 @@ const SOSButton = () => {
       const data = await response.json();
 
       if (response.ok) {
-        setMessage(`✅ SOS Sent! Help is on the way.`);
+        setMessage(` SOS Sent! Help is on the way.`);
         setShowConfirm(false);
         
         // Navigate to emergency status page
