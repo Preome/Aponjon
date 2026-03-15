@@ -37,6 +37,7 @@ import Messages from './pages/Messages';
 import HealthReports from './pages/HealthReports';
 import AddHealthRecord from './pages/AddHealthRecord';
 import HealthTips from './pages/HealthTips';
+import MyAccepted from './pages/MyAccepted';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -175,6 +176,11 @@ function App() {
               </ProtectedRoute>
             } />
             
+            <Route path="/my-accepted" element={
+              <ProtectedRoute allowedRoles={['volunteer']}>
+                <MyAccepted />
+              </ProtectedRoute>
+            } />
             {/* Admin Routes */}
             <Route path="/admin-dashboard" element={
               <ProtectedRoute allowedRoles={['admin']}>
