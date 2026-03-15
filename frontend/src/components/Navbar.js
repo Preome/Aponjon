@@ -38,27 +38,6 @@ const Navbar = () => {
     }
   };
 
-  // Navigation items - CONDITIONALLY RENDERED
-  const getNavigationItems = () => {
-    // If user is logged in, show minimal navigation
-    if (user) {
-      return [
-        { name: 'Dashboard', href: user.role === 'elderly' ? '/elderly-dashboard' : 
-                               user.role === 'volunteer' ? '/volunteer-dashboard' : 
-                               '/admin-dashboard' }
-      ];
-    }
-    // If not logged in, show full navigation
-    return [
-      { name: 'Home', href: '/' },
-      { name: 'About', href: '/about' },
-      { name: 'Services', href: '/services' },
-      { name: 'Contact', href: '/contact' },
-    ];
-  };
-
-  const navigation = getNavigationItems();
-
   const handleLogout = () => {
     logout();
     navigate('/');
@@ -66,7 +45,7 @@ const Navbar = () => {
 
   // Get dashboard link based on user role
   const getDashboardLink = () => {
-    if (!user) return '/login';
+    if (!user) return '/';
     
     switch(user.role) {
       case 'elderly':
@@ -90,24 +69,16 @@ const Navbar = () => {
             <span className="text-sm text-gray-500 italic">- Elderly Care</span>
           </Link>
 
-          {/* Desktop Menu - CONDITIONAL */}
+          {/* Empty middle section - NO Home, About, Services, Contact */}
           <div className="hidden md:flex items-center space-x-8">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="text-gray-700 hover:text-primary-600 transition duration-300 font-medium"
-              >
-                {item.name}
-              </Link>
-            ))}
+            {/* Nothing here */}
           </div>
 
           {/* Auth Buttons / User Menu */}
           <div className="hidden md:flex items-center space-x-4">
             {user ? (
               <>
-                {/* Notification Bell */}
+                {/* Notification Bell (only for elderly) */}
                 {user.role === 'elderly' && (
                   <div className="relative">
                     <button
@@ -152,8 +123,8 @@ const Navbar = () => {
                     )}
                   </div>
                 )}
-
-                {/* Dashboard Link (already in nav, but keep for redundancy) */}
+                
+                {/* Dashboard Link */}
                 <Link
                   to={getDashboardLink()}
                   className="text-primary-600 hover:text-primary-700 font-medium transition duration-300"
@@ -204,17 +175,7 @@ const Navbar = () => {
         {/* Mobile Menu */}
         {isOpen && (
           <div className="md:hidden py-4 border-t border-gray-200">
-            {navigation.map((item) => (
-              <Link
-                key={item.name}
-                to={item.href}
-                className="block py-2 text-gray-700 hover:text-primary-600 transition duration-300"
-                onClick={() => setIsOpen(false)}
-              >
-                {item.name}
-              </Link>
-            ))}
-            <div className="flex flex-col space-y-2 mt-4 pt-4 border-t border-gray-200">
+            <div className="flex flex-col space-y-2">
               {user ? (
                 <>
                   {/* Mobile Notification */}
