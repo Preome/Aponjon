@@ -6,7 +6,6 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 
-// Updated CORS configuration
 app.use(cors({
   origin: 'http://localhost:3000',
   credentials: true
@@ -26,7 +25,8 @@ const emergencyRoutes = require('./routes/emergencyRoutes');
 const geminiChatRoutes = require('./routes/geminiChatRoutes');
 const medicationRoutes = require('./routes/medicationRoutes');
 const messageRoutes = require('./routes/messageRoutes');
-const healthReportRoutes = require('./routes/healthReportRoutes'); // ← ADD THIS
+const healthReportRoutes = require('./routes/healthReportRoutes');
+const adminRoutes = require('./routes/adminRoutes'); // ← ADD THIS
 
 // Use routes
 app.use('/api/users', userRoutes);
@@ -35,17 +35,12 @@ app.use('/api/emergency', emergencyRoutes);
 app.use('/api/gemini', geminiChatRoutes);
 app.use('/api/medications', medicationRoutes);
 app.use('/api/messages', messageRoutes);
-app.use('/api/health', healthReportRoutes); // ← ADD THIS
+app.use('/api/health', healthReportRoutes);
+app.use('/api/admin', adminRoutes); // ← ADD THIS
 
 // Simple test route
 app.get('/api/test', (req, res) => {
   res.json({ message: 'Server is working!' });
-});
-
-// Error handling middleware
-app.use((err, req, res, next) => {
-  console.error('❌ Server error:', err.stack);
-  res.status(500).json({ message: 'Something went wrong!' });
 });
 
 const PORT = process.env.PORT || 5000;
