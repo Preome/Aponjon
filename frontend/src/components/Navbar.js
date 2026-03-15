@@ -60,16 +60,16 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50">
+    <nav className="bg-primary-600 shadow-lg sticky top-0 z-50"> {/* Changed to primary-600 */}
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-20">
-          {/* Logo */}
+          {/* Logo - White text */}
           <Link to={user ? getDashboardLink() : '/'} className="flex items-center space-x-2">
-            <span className="text-3xl font-bold text-primary-600">Aponjon</span>
-            <span className="text-sm text-gray-500 italic">- Elderly Care</span>
+            <span className="text-3xl font-bold text-white">Aponjon</span>
+            <span className="text-sm text-white/80 italic">- Elderly Care</span>
           </Link>
 
-          {/* Empty middle section - NO Home, About, Services, Contact */}
+          {/* Empty middle section */}
           <div className="hidden md:flex items-center space-x-8">
             {/* Nothing here */}
           </div>
@@ -83,7 +83,7 @@ const Navbar = () => {
                   <div className="relative">
                     <button
                       onClick={() => setShowNotifications(!showNotifications)}
-                      className="relative p-2 text-gray-600 hover:text-primary-600 transition"
+                      className="relative p-2 text-white hover:text-white/80 transition"
                     >
                       <BellIcon className="h-6 w-6" />
                       {notificationCount > 0 && (
@@ -124,15 +124,15 @@ const Navbar = () => {
                   </div>
                 )}
                 
-                {/* Dashboard Link */}
+                {/* Dashboard Link - White text */}
                 <Link
                   to={getDashboardLink()}
-                  className="text-primary-600 hover:text-primary-700 font-medium transition duration-300"
+                  className="text-white hover:text-white/80 font-medium transition duration-300"
                 >
                   Dashboard
                 </Link>
                 
-                {/* Logout Button */}
+                {/* Logout Button - White with red background */}
                 <button
                   onClick={handleLogout}
                   className="flex items-center space-x-2 bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 transition duration-300 font-medium"
@@ -145,13 +145,13 @@ const Navbar = () => {
               <>
                 <Link
                   to="/login"
-                  className="text-primary-600 hover:text-primary-700 font-medium transition duration-300"
+                  className="text-white hover:text-white/80 font-medium transition duration-300"
                 >
                   Login
                 </Link>
                 <Link
                   to="/register"
-                  className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition duration-300 font-medium"
+                  className="bg-white text-primary-600 px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300 font-medium"
                 >
                   Sign Up
                 </Link>
@@ -159,10 +159,10 @@ const Navbar = () => {
             )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button - White */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden text-gray-700 hover:text-primary-600 focus:outline-none"
+            className="md:hidden text-white hover:text-white/80 focus:outline-none"
           >
             {isOpen ? (
               <XMarkIcon className="h-8 w-8" />
@@ -174,7 +174,7 @@ const Navbar = () => {
 
         {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden py-4 border-t border-gray-200">
+          <div className="md:hidden py-4 border-t border-white/20 bg-primary-600"> {/* Changed to primary-600 */}
             <div className="flex flex-col space-y-2">
               {user ? (
                 <>
@@ -182,7 +182,7 @@ const Navbar = () => {
                   {user.role === 'elderly' && notificationCount > 0 && (
                     <Link
                       to="/medications"
-                      className="flex items-center space-x-2 bg-red-100 text-red-700 px-4 py-2 rounded-lg"
+                      className="flex items-center space-x-2 bg-white/20 text-white px-4 py-2 rounded-lg"
                       onClick={() => setIsOpen(false)}
                     >
                       <BellIcon className="h-5 w-5" />
@@ -191,7 +191,7 @@ const Navbar = () => {
                   )}
                   <Link
                     to={getDashboardLink()}
-                    className="text-primary-600 hover:text-primary-700 font-medium py-2"
+                    className="text-white hover:text-white/80 font-medium py-2"
                     onClick={() => setIsOpen(false)}
                   >
                     Dashboard
@@ -201,7 +201,7 @@ const Navbar = () => {
                       handleLogout();
                       setIsOpen(false);
                     }}
-                    className="flex items-center justify-center space-x-2 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition duration-300"
+                    className="flex items-center justify-center space-x-2 bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition duration-300"
                   >
                     <ArrowRightOnRectangleIcon className="h-5 w-5" />
                     <span>Logout</span>
@@ -211,14 +211,14 @@ const Navbar = () => {
                 <>
                   <Link
                     to="/login"
-                    className="text-primary-600 hover:text-primary-700 font-medium py-2"
+                    className="text-white hover:text-white/80 font-medium py-2"
                     onClick={() => setIsOpen(false)}
                   >
                     Login
                   </Link>
                   <Link
                     to="/register"
-                    className="bg-primary-600 text-white px-6 py-2 rounded-lg hover:bg-primary-700 transition duration-300 text-center"
+                    className="bg-white text-primary-600 px-6 py-2 rounded-lg hover:bg-gray-100 transition duration-300 text-center"
                     onClick={() => setIsOpen(false)}
                   >
                     Sign Up
