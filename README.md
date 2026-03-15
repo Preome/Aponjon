@@ -26,8 +26,9 @@ Aponjon is a full-stack platform that enables elderly users to request help, man
 
 ## Tech Stack
 
-Frontend: React, Tailwind css
-Backend: Node.js,Express.js,MongoDB
+- **Frontend:** React, Tailwind CSS
+- **Backend:** Node.js, Express.js
+- **Database:** MongoDB
 
 ### Backend
 - Run the development server:
