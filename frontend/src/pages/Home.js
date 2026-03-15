@@ -6,7 +6,10 @@ import {
   ClockIcon, 
   UserGroupIcon,
   ShieldCheckIcon,
-  CalendarIcon 
+  CalendarIcon,
+  ChatBubbleLeftRightIcon,
+  UsersIcon,
+  DocumentTextIcon
 } from '@heroicons/react/24/outline';
 
 const Home = () => {
@@ -30,21 +33,21 @@ const Home = () => {
       color: 'text-blue-500'
     },
     {
-      icon: UserGroupIcon,
-      title: 'Family Connection',
-      description: 'Stay connected with family members through updates and alerts',
+      icon: UsersIcon,
+      title: 'Elder Community',
+      description: 'Connect with other elders, join groups, and build meaningful friendships',
       color: 'text-purple-500'
     },
     {
-      icon: ShieldCheckIcon,
-      title: 'Safety First',
-      description: '24/7 monitoring and quick response system for peace of mind',
+      icon: ChatBubbleLeftRightIcon,
+      title: 'AI Health Assistant',
+      description: 'Get instant health advice and companionship from our AI chatbot',
       color: 'text-yellow-500'
     },
     {
-      icon: CalendarIcon,
-      title: 'Appointment Management',
-      description: 'Schedule and track doctor appointments and checkups',
+      icon: DocumentTextIcon,
+      title: 'Health Reports',
+      description: 'Generate and download comprehensive health reports to share with doctors',
       color: 'text-indigo-500'
     }
   ];
@@ -70,9 +73,7 @@ const Home = () => {
                 <Link to="/register" className="btn-primary text-lg px-8 py-3">
                   Get Started
                 </Link>
-                <Link to="/about" className="bg-white text-primary-600 border-2 border-primary-600 px-8 py-3 rounded-lg hover:bg-primary-50 transition duration-300 text-lg">
-                  Learn More
-                </Link>
+                
               </div>
             </div>
             <div className="lg:w-1/2">
@@ -144,15 +145,15 @@ const Home = () => {
               <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl font-bold text-primary-600">2</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Connect Devices</h3>
-              <p className="text-gray-600">Link health monitoring devices and emergency contacts</p>
+              <h3 className="text-xl font-semibold mb-2">Connect with Community</h3>
+              <p className="text-gray-600">Join groups, make friends, and chat with other elders</p>
             </div>
             <div className="text-center max-w-xs">
               <div className="w-20 h-20 bg-primary-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-3xl font-bold text-primary-600">3</span>
               </div>
-              <h3 className="text-xl font-semibold mb-2">Start Monitoring</h3>
-              <p className="text-gray-600">Get real-time updates and peace of mind</p>
+              <h3 className="text-xl font-semibold mb-2">Track & Monitor</h3>
+              <p className="text-gray-600">Manage medications, track health, and get AI assistance</p>
             </div>
           </div>
         </div>
