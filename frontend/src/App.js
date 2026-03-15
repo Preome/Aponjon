@@ -36,6 +36,7 @@ import Messages from './pages/Messages';
 // Health Reports Pages
 import HealthReports from './pages/HealthReports';
 import AddHealthRecord from './pages/AddHealthRecord';
+import HealthTips from './pages/HealthTips';
 
 const ProtectedRoute = ({ children, allowedRoles }) => {
   const { user, loading } = useAuth();
@@ -142,7 +143,11 @@ function App() {
                 <AddHealthRecord />
               </ProtectedRoute>
             } />
-            
+            <Route path="/health-tips" element={
+              <ProtectedRoute allowedRoles={['elderly']}>
+                <HealthTips />
+              </ProtectedRoute>
+            } />
             {/* Volunteer Routes */}
             <Route path="/volunteer-dashboard" element={
               <ProtectedRoute allowedRoles={['volunteer']}>
