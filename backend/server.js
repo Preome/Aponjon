@@ -6,8 +6,13 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 
+// Update CORS to allow both localhost and your Vercel app
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: [
+    'http://localhost:3000',
+    'https://aponjon.vercel.app',
+    'https://www.aponjon.vercel.app' // Add if you have www subdomain
+  ],
   credentials: true
 }));
 
@@ -26,7 +31,7 @@ const geminiChatRoutes = require('./routes/geminiChatRoutes');
 const medicationRoutes = require('./routes/medicationRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const healthReportRoutes = require('./routes/HealthReportRoutes');
-const adminRoutes = require('./routes/adminRoutes'); // ← ADD THIS
+const adminRoutes = require('./routes/adminRoutes');
 
 // Use routes
 app.use('/api/users', userRoutes);
@@ -36,7 +41,7 @@ app.use('/api/gemini', geminiChatRoutes);
 app.use('/api/medications', medicationRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/health', healthReportRoutes);
-app.use('/api/admin', adminRoutes); // ← ADD THIS
+app.use('/api/admin', adminRoutes);
 
 // Simple test route
 app.get('/api/test', (req, res) => {
