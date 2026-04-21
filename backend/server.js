@@ -6,12 +6,13 @@ const dotenv = require('dotenv');
 dotenv.config();
 const app = express();
 
-// Update CORS to allow both localhost and your Vercel app
+// Update CORS to allow both localhost and your Render frontend
 app.use(cors({
   origin: [
     'http://localhost:3000',
     'https://aponjon.vercel.app',
-    'https://www.aponjon.vercel.app' // Add if you have www subdomain
+    'https://aponjon-elderlycare.onrender.com',  // Your Render frontend
+    'https://aponjon-1.onrender.com'  // Your Render backend
   ],
   credentials: true
 }));
@@ -49,4 +50,4 @@ app.get('/api/test', (req, res) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 Server running on port ${PORT}`));`));
