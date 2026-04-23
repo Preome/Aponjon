@@ -15,6 +15,9 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // ✅ Get API URL from environment variable
+  const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:5000/api';
+
   // Load user from localStorage on mount
   useEffect(() => {
     const loadUser = () => {
@@ -46,15 +49,14 @@ export const AuthProvider = ({ children }) => {
     loadUser();
   }, []);
 
-  // UPDATED: Removed selectedRole parameter and return role
   const login = async (email, password) => {
     try {
       setLoading(true);
       setError(null);
       
-      console.log('Sending login request...');
+      console.log('Sending login request to:', `${API_URL}/users/login`);
       
-      const response = await fetch('http://localhost:5000/api/users/login', {
+      const response = await fetch(`${API_URL}/users/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -66,13 +68,12 @@ export const AuthProvider = ({ children }) => {
       console.log('Login response:', data);
       
       if (response.ok) {
-        // Store in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data));
         setUser(data);
         return { 
           success: true, 
-          role: data.role  // Return the role from response
+          role: data.role
         };
       } else {
         setError(data.message || 'Login failed');
@@ -92,7 +93,9 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
       setError(null);
       
-      const response = await fetch('http://localhost:5000/api/users/register', {
+      console.log('Sending register request to:', `${API_URL}/users/register`);
+      
+      const response = await fetch(`${API_URL}/users/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
