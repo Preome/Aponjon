@@ -7,6 +7,7 @@ import {
   BellIcon
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -27,10 +28,7 @@ const Navbar = () => {
 
   const fetchNotificationCount = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/medications/active', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await api.get('/medications/active');
       const data = await response.json();
       setNotificationCount(data.due.length);
     } catch (error) {

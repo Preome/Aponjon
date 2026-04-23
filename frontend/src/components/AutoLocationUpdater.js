@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 
 const AutoLocationUpdater = ({ onComplete }) => {
   const { user } = useAuth();
@@ -54,14 +55,7 @@ const AutoLocationUpdater = ({ onComplete }) => {
 
             // Send to backend
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:5000/api/help/update-location', {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-              },
-              body: JSON.stringify(locationData)
-            });
+            const response = await api.put('/help/update-location', locationData);
 
             if (response.ok) {
               setStatus('success');

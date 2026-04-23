@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 
 const ElderlyLocationUpdater = ({ onLocationUpdate }) => {
   const { user } = useAuth();
@@ -50,21 +51,11 @@ const ElderlyLocationUpdater = ({ onLocationUpdate }) => {
           // Get address from coordinates
           const locationInfo = await reverseGeocode(latitude, longitude);
           
-          const token = localStorage.getItem('token');
-          
-          // Update location in backend
-          const response = await fetch('http://localhost:5000/api/help/update-location', {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-              coordinates: [longitude, latitude],
-              address: locationInfo?.address || `Location at ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
-              city: locationInfo?.city || 'Unknown'
-            })
-          });
+        const response = await api.put('/help/update-location', {
+          coordinates: [longitude, latitude],
+          address: locationInfo?.address || `Location at ${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
+          city: locationInfo?.city || 'Unknown'
+        });
 
           if (response.ok) {
             setAddress(locationInfo?.address || 'Location updated');
@@ -96,10 +87,7 @@ const ElderlyLocationUpdater = ({ onLocationUpdate }) => {
   useEffect(() => {
     const checkLocation = async () => {
       try {
-        const token = localStorage.getItem('token');
-        const response = await fetch('http://localhost:5000/api/users/me', {
-          headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await api.get('/users/me');
         const userData = await response.json();
         
         if (userData.location && userData.location.coordinates) {

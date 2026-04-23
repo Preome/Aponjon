@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 import { 
   ChatBubbleLeftRightIcon, 
   XMarkIcon,
@@ -24,10 +25,7 @@ const Chatbot = () => {
 
   const fetchDailyTip = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/gemini/tip', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await api.get('/gemini/tip');
       const data = await response.json();
       setDailyTip(data.tip);
     } catch (error) {
@@ -68,20 +66,11 @@ const Chatbot = () => {
     setIsTyping(true);
 
     try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch('http://localhost:5000/api/gemini/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify({
-          message: inputMessage,
-          conversationHistory: messages.slice(-5)
-        })
+      const response = await api.post('/gemini/chat', {
+        message: inputMessage,
+        conversationHistory: messages.slice(-5)
       });
-
+      
       const data = await response.json();
       
       const botMessage = {

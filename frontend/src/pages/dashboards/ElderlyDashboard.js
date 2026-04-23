@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { api } from '../../services/api';
 import SOSButton from '../../components/SOSButton';
 import ElderlyLocationUpdater from '../../components/ElderlyLocationUpdater';
 import AutoLocationUpdater from '../../components/AutoLocationUpdater';
@@ -39,10 +40,7 @@ const ElderlyDashboard = () => {
 
   const checkLocationStatus = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/users/me', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await api.get('/users/me');
       const userData = await response.json();
       
       if (userData.location && userData.location.coordinates) {
@@ -55,14 +53,7 @@ const ElderlyDashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const token = localStorage.getItem('token');
-      
-      const response = await fetch('http://localhost:5000/api/help/my-requests', {
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
-      
+      const response = await api.get('/help/my-requests');
       const requests = await response.json();
       
       const total = requests.length;

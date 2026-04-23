@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { api } from '../services/api';
 import { BellIcon, ClockIcon, CheckCircleIcon } from '@heroicons/react/24/outline';
 
 const MedicationAlerts = () => {
@@ -45,10 +46,7 @@ const MedicationAlerts = () => {
 
   const fetchAlerts = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:5000/api/medications/active', {
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      const response = await api.get('/medications/active');
       const data = await response.json();
       setAlerts(data);
     } catch (error) {
@@ -60,11 +58,7 @@ const MedicationAlerts = () => {
 
   const handleTakeDose = async (medId, timeIndex) => {
     try {
-      const token = localStorage.getItem('token');
-      await fetch(`http://localhost:5000/api/medications/${medId}/take/${timeIndex}`, {
-        method: 'PUT',
-        headers: { 'Authorization': `Bearer ${token}` }
-      });
+      await api.put(`/medications/${medId}/take/${timeIndex}`);
       fetchAlerts(); // Refresh alerts
     } catch (error) {
       console.error('Failed to mark dose as taken:', error);
